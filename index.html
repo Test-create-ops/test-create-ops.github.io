@@ -1,11 +1,120 @@
 <!DOCTYPE html>
 <html lang="it">
-<head><meta charset="UTF-8"><title>KairoStore</title>
-<style>body{font-family:sans-serif;text-align:center;padding:100px 20px;background:#fafafa}h1{font-size:3em;color:#333}.coming{color:#666;font-size:1.2em}</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KairoStore</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    .logo {
+      font-size: 4rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
+      letter-spacing: -2px;
+    }
+    .subtitle {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 40px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 40px 50px;
+      max-width: 500px;
+      width: 100%;
+      backdrop-filter: blur(10px);
+    }
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #00d2ff;
+    }
+    .card p {
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+    .status {
+      display: inline-block;
+      padding: 8px 20px;
+      background: rgba(0,210,255,0.15);
+      border: 1px solid rgba(0,210,255,0.3);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: #00d2ff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+    }
+    .progress {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 35%;
+      background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+      border-radius: 4px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    .footer {
+      margin-top: 40px;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.3);
+    }
+    .footer a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+    }
+    .footer a:hover {
+      color: #00d2ff;
+    }
+    @media (max-width: 480px) {
+      .logo { font-size: 2.5rem; }
+      .card { padding: 30px 20px; }
+    }
+  </style>
 </head>
 <body>
-<h1>KairoStore</h1>
-<p class="coming">Store di app Kairo — in arrivo.</p>
-<p>Powered by KairoNET</p>
+  <div class="logo">KairoStore</div>
+  <div class="subtitle">Coming Soon</div>
+  <div class="card">
+    <span class="status">In sviluppo</span>
+    <h2>Store di app Kairo</h2>
+    <p>App, giochi e strumenti firmati KairoNET. Liberi, veloci, senza censura.</p>
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div>
+  </div>
+  <div class="footer">
+    Powered by KairoNET &middot; <a href="#">kaironet@proton.me</a>
+  </div>
 </body>
 </html>
