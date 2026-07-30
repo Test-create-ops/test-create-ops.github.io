@@ -9,112 +9,209 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
       color: #fff;
-      text-align: center;
-      padding: 20px;
     }
-    .logo {
-      font-size: 4rem;
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 30px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-logo { font-size: 1.4rem; font-weight: 800; color: #00d2ff; }
+    .nav-links { display: flex; gap: 10px; }
+    .nav-links button {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+    .nav-links button:hover, .nav-links button.active {
+      background: rgba(0,210,255,0.15);
+      border-color: #00d2ff;
+      color: #fff;
+    }
+    .hero {
+      text-align: center;
+      padding: 60px 20px 40px;
+    }
+    .hero h1 {
+      font-size: 3.5rem;
       font-weight: 800;
       background: linear-gradient(90deg, #00d2ff, #3a7bd5);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       margin-bottom: 10px;
-      letter-spacing: -2px;
     }
-    .subtitle {
-      font-size: 1.2rem;
-      color: rgba(255,255,255,0.6);
-      margin-bottom: 40px;
+    .hero p {
+      color: rgba(255,255,255,0.5);
+      font-size: 1.1rem;
       text-transform: uppercase;
-      letter-spacing: 4px;
+      letter-spacing: 3px;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      margin: 30px 0 20px 30px;
+      color: #fff;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+      padding: 0 30px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
     }
     .card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      padding: 40px 50px;
-      max-width: 500px;
-      width: 100%;
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 24px;
+      transition: 0.25s;
+      cursor: default;
     }
-    .card h2 {
-      font-size: 1.5rem;
-      margin-bottom: 10px;
+    .card:hover { background: rgba(255,255,255,0.07); border-color: rgba(0,210,255,0.3); transform: translateY(-2px); }
+    .card-icon { font-size: 2rem; margin-bottom: 12px; }
+    .card h3 { font-size: 1.1rem; margin-bottom: 6px; color: #fff; }
+    .card p { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 16px; line-height: 1.5; }
+    .card button {
+      background: rgba(0,210,255,0.12);
+      border: 1px solid rgba(0,210,255,0.25);
       color: #00d2ff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: 0.2s;
+      width: 100%;
     }
-    .card p {
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 25px;
-      line-height: 1.6;
+    .card button:hover { background: rgba(0,210,255,0.25); }
+    .card button.downloaded {
+      background: rgba(0,255,100,0.12);
+      border-color: rgba(0,255,100,0.3);
+      color: #00ff64;
     }
-    .status {
-      display: inline-block;
-      padding: 8px 20px;
+    #message {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
       background: rgba(0,210,255,0.15);
       border: 1px solid rgba(0,210,255,0.3);
-      border-radius: 50px;
-      font-size: 0.85rem;
-      color: #00d2ff;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 30px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: 0.4s;
+      pointer-events: none;
+      backdrop-filter: blur(10px);
     }
-    .progress {
-      width: 100%;
-      height: 4px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 100%;
-      width: 35%;
-      background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-      border-radius: 4px;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
-    }
+    #message.show { opacity: 1; }
     .footer {
-      margin-top: 40px;
+      text-align: center;
+      padding: 30px;
+      color: rgba(255,255,255,0.2);
       font-size: 0.8rem;
-      color: rgba(255,255,255,0.3);
+      border-top: 1px solid rgba(255,255,255,0.05);
     }
-    .footer a {
-      color: rgba(255,255,255,0.4);
-      text-decoration: none;
-    }
-    .footer a:hover {
-      color: #00d2ff;
-    }
-    @media (max-width: 480px) {
-      .logo { font-size: 2.5rem; }
-      .card { padding: 30px 20px; }
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 2.2rem; }
+      nav { flex-direction: column; gap: 12px; }
+      .grid { padding: 0 16px 40px; }
     }
   </style>
 </head>
 <body>
-  <div class="logo">KairoStore</div>
-  <div class="subtitle">Coming Soon</div>
-  <div class="card">
-    <span class="status">In sviluppo</span>
-    <h2>Store di app Kairo</h2>
-    <p>App, giochi e strumenti firmati KairoNET. Liberi, veloci, senza censura.</p>
-    <div class="progress">
-      <div class="progress-bar"></div>
-    </div>
+
+<nav>
+  <div class="nav-logo">KairoStore</div>
+  <div class="nav-links">
+    <button class="active" data-filter="all">Tutte</button>
+    <button data-filter="app">App</button>
+    <button data-filter="gioco">Giochi</button>
+    <button data-filter="strumento">Strumenti</button>
   </div>
-  <div class="footer">
-    Powered by KairoNET &middot; <a href="#">kaironet@proton.me</a>
-  </div>
+</nav>
+
+<div class="hero">
+  <h1>KairoStore</h1>
+  <p>App, giochi e strumenti KairoNET</p>
+</div>
+
+<div class="grid" id="appGrid"></div>
+
+<div id="message"></div>
+
+<div class="footer">Powered by KairoNET &middot; kaironet@proton.me</div>
+
+<script>
+  const apps = [
+    { name: 'KairoCalc', cat: 'app', desc: 'Calcolatrice firmata Kairo.', icon: '🧮', url: '#' },
+    { name: 'KairoChat', cat: 'app', desc: 'Chat cifrata peer-to-peer.', icon: '💬', url: '#' },
+    { name: 'KairoRun', cat: 'gioco', desc: 'Endless runner cyberpunk.', icon: '🏃', url: '#' },
+    { name: 'KairoDefender', cat: 'gioco', desc: 'Tower defense neon.', icon: '🛡️', url: '#' },
+    { name: 'KairoTerm', cat: 'strumento', desc: 'Terminale stile cyberdeck.', icon: '💻', url: '#' },
+    { name: 'KairoScan', cat: 'strumento', desc: 'Scansiona reti e porte.', icon: '🔍', url: '#' },
+  ];
+
+  const downloaded = new Set();
+  let currentFilter = 'all';
+  const grid = document.getElementById('appGrid');
+  const msg = document.getElementById('message');
+
+  function showMessage(text, good) {
+    msg.textContent = text;
+    msg.style.borderColor = good ? 'rgba(0,255,100,0.4)' : 'rgba(255,50,50,0.4)';
+    msg.style.background = good ? 'rgba(0,255,100,0.1)' : 'rgba(255,50,50,0.1)';
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 2500);
+  }
+
+  function render(filter) {
+    const filtered = filter === 'all' ? apps : apps.filter(a => a.cat === filter);
+    grid.innerHTML = filtered.map(a => {
+      const dl = downloaded.has(a.name);
+      return `<div class="card" data-cat="${a.cat}">
+        <div class="card-icon">${a.icon}</div>
+        <h3>${a.name}</h3>
+        <p>${a.desc}</p>
+        <button class="${dl ? 'downloaded' : ''}" data-name="${a.name}">${dl ? '✔ Installato' : 'Installa'}</button>
+      </div>`;
+    }).join('');
+
+    document.querySelectorAll('.card button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const name = e.target.dataset.name;
+        if (downloaded.has(name)) {
+          showMessage(`${name} è già installato.`, false);
+          return;
+        }
+        downloaded.add(name);
+        e.target.textContent = '✔ Installato';
+        e.target.classList.add('downloaded');
+        showMessage(`${name} installato con successo!`, true);
+      });
+    });
+  }
+
+  document.querySelectorAll('.nav-links button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      render(currentFilter);
+    });
+  });
+
+  render('all');
+</script>
 </body>
 </html>
