@@ -1,123 +1,750 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KairoStore</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-    }
-    .logo {
-      font-size: 4rem;
-      font-weight: 800;
-      background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 10px;
-      letter-spacing: -2px;
-    }
-    .subtitle {
-      font-size: 1.2rem;
-      color: rgba(255,255,255,0.6);
-      margin-bottom: 40px;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-    }
-    .card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      padding: 40px 50px;
-      max-width: 500px;
-      width: 100%;
-      backdrop-filter: blur(10px);
-    }
-    .card h2 {
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-      color: #00d2ff;
-    }
-    .card p {
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 25px;
-      line-height: 1.6;
-    }
-    .status {
-      display: inline-block;
-      padding: 8px 20px;
-      background: rgba(0,210,255,0.15);
-      border: 1px solid rgba(0,210,255,0.3);
-      border-radius: 50px;
-      font-size: 0.85rem;
-      color: #00d2ff;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 30px;
-    }
-    .progress {
-      width: 100%;
-      height: 4px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 100%;
-      width: 35%;
-      background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-      border-radius: 4px;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
-    }
-    .footer {
-      margin-top: 40px;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.3);
-    }
-    .footer a {
-      color: rgba(255,255,255,0.4);
-      text-decoration: none;
-    }
-    .footer a:hover { color: #00d2ff; }
-    @media (max-width: 480px) {
-      .logo { font-size: 2.5rem; }
-      .card { padding: 30px 20px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kairo Store — Developers</title>
+<link rel="icon" href="icons/kairo_logo.png">
+<style>
+  @font-face{
+    font-family:'Material Icons';
+    font-style:normal; font-weight:400;
+    src:url('fonts/material-icons.woff2') format('woff2');
+  }
+  :root{
+    --bg:#1e1e2e; --surface:#28283a; --text:#cdd6f4; --accent:#89b4fa;
+    --border:#45475a; --button:#313244; --button-hover:#45475a; --error:#f38ba8;
+    --ok:#a6e3a1; --warn:#f9e2af; --muted:#a6adc8; --faint:#585b70;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; min-height:100vh;}
+  a{color:var(--accent); text-decoration:none;}
+  button{cursor:pointer; font-family:inherit;}
+  .hidden{display:none !important;}
+
+  /* Material Icons */
+  .mi{font-family:'Material Icons'; font-weight:normal; font-style:normal; font-size:20px;
+      display:inline-block; line-height:1; letter-spacing:normal; text-transform:none;
+      white-space:nowrap; word-wrap:normal; direction:ltr; user-select:none;
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; vertical-align:middle;}
+  .mi-s{font-size:15px;}
+  .mi-m{font-size:22px;}
+  .mi-l{font-size:28px;}
+  .mi-xl{font-size:56px;}
+  .mi-bright{color:var(--accent);}
+
+  /* Header */
+  header{position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:20px;
+         padding:12px 28px; background:rgba(30,30,46,.82); backdrop-filter:blur(12px);
+         border-bottom:1px solid var(--border);}
+  .brand{display:flex; align-items:center; gap:10px; font-size:19px; font-weight:800; letter-spacing:.3px;}
+  .brand b{color:var(--accent);}
+  .brand img{width:26px; height:26px;}
+  .nav{display:flex; gap:6px; margin-left:6px;}
+  .nav button{display:flex; align-items:center; gap:8px; background:transparent; border:1px solid transparent;
+              color:var(--text); padding:8px 16px; border-radius:10px; font-size:14px; font-weight:600;}
+  .nav button:hover{background:var(--button);}
+  .nav button.on{background:var(--button); border-color:var(--accent); color:var(--accent);}
+  .nav button .mi{font-size:19px;}
+  .spacer{flex:1;}
+  .userchip{display:flex; align-items:center; gap:8px; background:var(--button); padding:6px 14px;
+            border-radius:999px; font-size:13px; border:1px solid var(--border);}
+  .userchip .dot{width:8px; height:8px; border-radius:50%; background:var(--ok);}
+
+  .wrap{max-width:1120px; margin:0 auto; padding:32px 28px 60px;}
+
+  /* Hero */
+  .hero{position:relative; overflow:hidden; background:linear-gradient(160deg, #34354a 0%, #232338 60%, #1e1e2e 100%);
+        border:1px solid var(--border); border-radius:20px; padding:44px 40px; margin-bottom:30px;}
+  .hero::before{content:""; position:absolute; top:-120px; right:-80px; width:340px; height:340px;
+                border-radius:50%; background:radial-gradient(circle, rgba(137,180,250,.16), transparent 65%); pointer-events:none;}
+  .hero h1{font-size:31px; line-height:1.25; margin-bottom:12px;}
+  .hero h1 b{color:var(--accent);}
+  .hero p{color:var(--muted); line-height:1.7; max-width:640px; font-size:15px;}
+  .badge{display:inline-flex; align-items:center; gap:8px; margin-bottom:18px; background:rgba(137,180,250,.14);
+         color:var(--accent); border:1px solid rgba(137,180,250,.35); font-weight:700;
+         padding:7px 16px; border-radius:999px; font-size:12px; letter-spacing:.4px; text-transform:uppercase;}
+  .badge .mi{font-size:15px;}
+
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:28px;}
+  .card h2{margin-bottom:14px; font-size:19px; display:flex; align-items:center; gap:10px;}
+  .card h2 .mi{font-size:22px; color:var(--accent);}
+
+  label{display:block; font-size:13px; color:var(--muted); margin:14px 0 6px; font-weight:600;}
+  input[type=text],input[type=email],input[type=password]{
+    width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--border);
+    background:var(--bg); color:var(--text); font-size:14px; transition:border-color .15s;}
+  input:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(137,180,250,.15);}
+
+  .btn{display:inline-flex; align-items:center; gap:9px; background:var(--accent); color:#11111b; border:none;
+       padding:12px 22px; border-radius:11px; font-size:14px; font-weight:700; transition:filter .15s;}
+  .btn:hover{filter:brightness(1.12);}
+  .btn .mi{font-size:19px;}
+  .btn.ghost{background:var(--button); color:var(--text); border:1px solid var(--border);}
+  .btn.ghost:hover{background:var(--button-hover); filter:none;}
+  .btn.big{font-size:15px; padding:14px 28px;}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+
+  /* Passi */
+  .steps{display:flex; gap:10px; margin:22px 0 28px;}
+  .step{flex:1; padding:14px 10px; border:1px solid var(--border); border-radius:13px; text-align:center;
+        font-size:12.5px; color:var(--muted); background:var(--surface);}
+  .step .num{display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px;
+             border-radius:50%; background:var(--button); color:var(--text); font-weight:800; margin-bottom:7px; font-size:13px;}
+  .step.done{border-color:var(--ok); color:var(--ok);}
+  .step.done .num{background:var(--ok); color:#11111b;}
+  .step.active{border-color:var(--accent); color:var(--accent); box-shadow:0 0 0 3px rgba(137,180,250,.12);}
+  .step.active .num{background:var(--accent); color:#11111b;}
+
+  .okbar{display:flex; align-items:center; gap:12px; background:rgba(166,227,161,.1); border:1px solid var(--ok);
+         color:var(--ok); padding:16px 20px; border-radius:13px; margin:18px 0; font-weight:600; font-size:14px;}
+  .okbar .mi{font-size:22px;}
+  .warnbar{display:flex; align-items:center; gap:12px; background:rgba(249,226,175,.1); border:1px solid var(--warn);
+           color:var(--warn); padding:16px 20px; border-radius:13px; margin:18px 0;}
+  .errbar{color:var(--error); font-size:13px; margin-top:10px;}
+
+  /* Store */
+  .section-title{font-size:24px; margin:10px 0 20px; display:flex; align-items:center; gap:12px;}
+  .section-title .mi{font-size:26px; color:var(--accent);}
+  .empty{text-align:center; padding:70px 20px; border:2px dashed var(--border); border-radius:20px;}
+  .empty .mi{font-size:64px; color:var(--faint); margin-bottom:18px;}
+  .empty b{font-size:18px;}
+  .empty p{color:var(--muted); margin:10px 0 22px; font-size:14px;}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-bottom:30px;}
+  .feature{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; text-align:center; transition:transform .12s, border-color .12s;}
+  .feature:hover{transform:translateY(-3px); border-color:var(--accent);}
+  .feature .mi{font-size:40px; color:var(--accent); margin-bottom:12px;}
+  .feature h3{font-size:15px; margin-bottom:4px;}
+  .feature p{font-size:12.5px; color:var(--muted);}
+
+  pre{background:var(--bg); border:1px solid var(--border); border-radius:13px; padding:20px;
+      overflow-x:auto; font-family:ui-monospace,Menlo,monospace; font-size:13px; line-height:1.8; color:#a6e3a1;}
+  .kw{color:#89b4fa;} .str{color:#f9e2af;} .ns{color:#f5c2e7;} .cm{color:#585b70;} .lit{color:#f38ba8;}
+
+  /* Portal */
+  .portal{display:grid; grid-template-columns:238px 1fr; gap:22px; margin-top:6px;}
+  .side{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:12px; align-self:start; max-height:calc(100vh - 120px); overflow-y:auto;}
+  .side::-webkit-scrollbar{width:8px;}
+  .side::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px;}
+  .side .stitle{font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:var(--faint); padding:8px 12px 10px; display:flex; align-items:center; gap:8px;}
+  .side .stitle .mi{font-size:17px;}
+  .side button{display:flex; align-items:center; gap:11px; width:100%; text-align:left; background:transparent;
+               border:none; color:var(--text); padding:8px 12px; border-radius:9px; font-size:13px; margin:1px 0; transition:background .12s;}
+  .side button:hover{background:var(--button);}
+  .side button.on{background:var(--button); color:var(--accent);}
+  .side button .mi{font-size:20px;}
+  .panel{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:30px;}
+  .panel h2{font-size:21px; margin-bottom:6px; display:flex; align-items:center; gap:12px;}
+  .panel h2 .mi{font-size:24px; color:var(--accent);}
+  .panel .sub{color:var(--muted); margin-bottom:22px; font-size:13px;}
+  .placeholder{border:2px dashed var(--border); border-radius:13px; padding:44px; text-align:center; color:var(--muted);}
+  .placeholder .mi{font-size:44px; color:var(--faint); margin-bottom:14px;}
+
+  /* Pannello icone (icone SDK) */
+  #iconSearch{max-width:340px; margin-bottom:18px;}
+  .igrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(86px,1fr)); gap:9px;}
+  .icell{background:var(--bg); border:1px solid var(--border); border-radius:11px; padding:12px 6px;
+         display:flex; flex-direction:column; align-items:center; gap:7px; color:var(--text); font-size:11px; transition:border-color .12s, transform .12s;}
+  .icell img{width:42px; height:42px;}
+  .icell:hover{border-color:var(--accent); transform:translateY(-2px);}
+
+  /* Upload certificato */
+  .filebox{border:2px dashed var(--border); border-radius:13px; padding:26px; text-align:center; color:var(--muted); transition:border-color .15s;}
+  .filebox:hover{border-color:var(--accent);}
+  .filebox .mi{font-size:34px; margin-bottom:10px; color:var(--faint);}
+  .certok{display:flex; align-items:center; gap:10px; background:rgba(166,227,161,.1); border:1px solid var(--ok);
+          color:var(--ok); padding:13px 16px; border-radius:12px; margin:12px 0; font-size:13.5px; font-weight:600;}
+  .certok .mi{font-size:20px;}
+
+  /* Modali email */
+  .overlay{position:fixed; inset:0; background:rgba(17,17,27,.75); display:flex; align-items:center; justify-content:center; z-index:100; padding:20px;}
+  .mail{width:600px; max-width:94vw; background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.5);}
+  .mail .mhead{display:flex; align-items:center; gap:13px; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--bg);}
+  .mail .mbadge{width:42px; height:42px; border-radius:11px; background:var(--accent); color:#11111b;
+                display:flex; align-items:center; justify-content:center;}
+  .mail .mbadge img{width:26px; height:26px;}
+  .mail .mbadge .mi{font-size:26px;}
+  .mail .mbody{padding:22px 20px; font-size:14px; line-height:1.7;}
+  .code{display:inline-block; font-family:ui-monospace,Menlo,monospace; font-size:24px; letter-spacing:7px;
+        background:var(--bg); border:1px dashed var(--accent); color:var(--accent); padding:11px 18px;
+        border-radius:11px; margin:14px 0;}
+  .attach{display:flex; align-items:center; gap:14px; background:rgba(137,180,250,.07); border:1px solid var(--accent);
+          border-radius:13px; padding:15px 18px; margin:16px 0;}
+  .attach .afile{width:42px; height:42px; border-radius:11px; background:var(--button); display:flex; align-items:center; justify-content:center;}
+  .attach .afile .mi{font-size:24px; color:var(--accent);}
+  .mail .mfoot{padding:14px 20px; border-top:1px solid var(--border); text-align:right; background:var(--bg);}
+  .sdklist{margin:12px 0 0 18px; color:var(--muted); line-height:2; font-size:13.5px;}
+  .sdklist b{color:var(--text);}
+
+  footer{text-align:center; color:var(--faint); font-size:12px; padding:34px; display:flex; align-items:center; justify-content:center; gap:8px;}
+  footer img{width:16px; height:16px; opacity:.6;}
+</style>
 </head>
 <body>
-  <div class="logo">KairoStore</div>
-  <div class="subtitle">Coming Soon</div>
-  <div class="card">
-    <span class="status">In sviluppo</span>
-    <h2>Store di app Kairo</h2>
-    <p>App, giochi e strumenti firmati KairoNET. Liberi, veloci, per tutti.</p>
-    <button onclick="alert('KairoStore in arrivo. Resta sintonizzato!')" style="background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.25);color:#00d2ff;padding:10px 24px;border-radius:10px;cursor:pointer;font-size:0.95rem;transition:0.2s;margin-bottom:20px" onmouseover="this.style.background='rgba(0,210,255,0.25)'" onmouseout="this.style.background='rgba(0,210,255,0.12)'">Notificami</button>
-    <div class="progress">
-      <div class="progress-bar"></div>
+
+<header>
+  <div class="brand"><img src="icons/kairo_logo.png" alt="Kairo">Kairo<b>Store</b></div>
+  <nav class="nav">
+    <button id="navStore" class="on"><span class="mi">apps</span>Store</button>
+    <button id="navSdk"><span class="mi">code</span>SDK</button>
+    <button id="navDev"><span class="mi">person</span>Developers</button>
+  </nav>
+  <div class="spacer"></div>
+  <div class="userchip hidden" id="userChip"><span class="dot"></span><span id="userName">—</span></div>
+</header>
+
+<!-- ================= STORE ================= -->
+<main id="pageStore" class="wrap">
+  <h1 class="section-title"><span class="mi">apps</span>Store KairoOS</h1>
+  <div class="empty">
+    <span class="mi">apps</span>
+    <b>Lo store è ancora vuoto</b>
+    <p>Le app vere appariranno qui quando i developer certificati le pubblicheranno.<br>
+       Nessuna app demo: solo app reali, create con KairoSDK.</p>
+    <button class="btn" onclick="showPage('dev')"><span class="mi">person</span>Diventa developer</button>
+  </div>
+</main>
+
+<!-- ================= SDK ================= -->
+<main id="pageSdk" class="wrap hidden">
+  <div class="hero">
+    <span class="badge"><span class="mi">verified_user</span>KairoSDK v0.1.0 — solo developer certificati</span>
+    <h1>L'SDK ufficiale per creare app <b>KairoOS</b>.</h1>
+    <p>Una libreria C++ facile e divertente per disegnare, suonare e costruire interfacce.
+       Con il wrapper <b style="color:var(--accent)">namespace kec</b> (Kairo Easy Coding)
+       inizi a creare in un minuto. L'SDK non è pubblico: lo ricevi via email solo dopo la certificazione.</p>
+    <div style="margin-top:22px;">
+      <button class="btn big" onclick="showPage('dev')"><span class="mi">lock</span>Lo ricevi solo con la certificazione</button>
     </div>
   </div>
-  <div class="footer" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
-    <a href="#" onclick="alert('Prossimamente')">Store</a>
-    <a href="#" onclick="alert('Prossimamente')">App</a>
-    <a href="#" onclick="alert('Prossimamente')">Contatti</a>
-    <span style="color:rgba(255,255,255,0.2)">&middot;</span>
-    <span>Powered by KairoNET</span>
+
+  <div class="grid">
+    <div class="feature"><span class="mi">draw</span><h3>Canvas</h3><p>disegna pixel, forme e testo</p></div>
+    <div class="feature"><span class="mi">image</span><h3>68 icone</h3><p>built-in a più colori</p></div>
+    <div class="feature"><span class="mi">volume_up</span><h3>66 suoni</h3><p>effetti sintetizzati</p></div>
+    <div class="feature"><span class="mi">music_note</span><h3>10 tracce</h3><p>musica di gioco</p></div>
+    <div class="feature"><span class="mi">widgets</span><h3>30+ widget</h3><p>pulsanti, slider, barre</p></div>
+    <div class="feature"><span class="mi">dark_mode</span><h3>Temi</h3><p>scuro, chiaro, custom</p></div>
   </div>
+
+  <div class="card" style="margin-bottom:30px;">
+    <h2><span class="mi">terminal</span>Il tuo primo programma in 6 righe</h2>
+    <pre><code><span class="kw">#include</span> <span class="str">"KairoECC.h"</span>
+<span class="kw">using namespace</span> <span class="ns">kec</span>;
+
+<span class="ns">Canvas</span> c(320, 240);
+c.clear(<span class="ns">White</span>);
+c.icon(<span class="lit">"heart"</span>, 100, 100, 32, <span class="ns">Red</span>);   <span class="cm">// disegna un cuore</span>
+c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
+    <p style="color:var(--muted); margin-top:16px; font-size:14px; line-height:1.7;">
+      Tutto vive nel <b style="color:var(--text)">namespace <code style="color:var(--accent)">kec</code></b>:
+      per comodità puoi anche scrivere <code style="color:var(--accent)">using namespace kec;</code>
+      una volta e poi usare <code style="color:var(--accent)">Canvas</code>, <code style="color:var(--accent)">White</code> e <code style="color:var(--accent)">Red</code> senza prefisso.
+      Compila con un semplice <b style="color:var(--text)">make</b>: l'SDK è una
+      <b style="color:var(--text)">dylib</b> per macOS (Apple Silicon) scritta in
+      <b style="color:var(--text)">C++17</b>, con anche la <b style="color:var(--text)">C API</b>
+      completa (<code style="color:var(--accent)">KairoSDK.h</code>). Tutto gira sul
+      <b style="color:var(--text)">software renderer</b>: nessuna libreria esterna.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="mi">verified_user</span>Come si riceve l'SDK</h2>
+    <p style="color:var(--muted); line-height:1.8; margin-bottom:18px; font-size:14px;">
+      1. Crea un account nella pagina <b style="color:var(--text)">Developers</b>.<br>
+      2. Ricevi via email la <b style="color:var(--text)">certificazione</b> con allegato: scarichi il certificato e lo carichi nel tuo account.<br>
+      3. Inserisci il <b style="color:var(--text)">codice</b> fornito nella stessa email.<br>
+      4. Certificazione attivata: ti arriva l'<b style="color:var(--text)">SDK</b> in allegato via email. </p>
+    <button class="btn" onclick="showPage('dev')"><span class="mi">person</span>Vai a Developers</button>
+  </div>
+</main>
+
+<!-- ================= DEVELOPERS ================= -->
+<main id="pageDev" class="wrap hidden">
+
+  <!-- Stato: non registrato -->
+  <section id="devHome">
+    <div class="hero">
+      <span class="badge"><span class="mi">verified_user</span>Developer Program</span>
+      <h1>Porta le tue app su <b>KairoOS</b>.</h1>
+      <p>Crea un account developer, ricevi la certificazione via email e attivala
+         caricando il certificato nel tuo account. Solo i developer certificati ricevono l'SDK.</p>
+    </div>
+    <div class="card" style="max-width:520px;">
+      <h2><span class="mi">person</span>Crea il tuo account developer</h2>
+      <form id="regForm">
+        <label>Nome utente</label>
+        <input type="text" id="regUser" placeholder="es. kairokid" required>
+        <label>Email</label>
+        <input type="email" id="regMail" placeholder="es. tu@email.com" required>
+        <label>Password</label>
+        <input type="password" id="regPass" placeholder="••••••••" required>
+        <div style="margin-top:20px;"><button class="btn big" type="submit"><span class="mi">arrow_forward</span>Crea account</button></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Stato: certificazione inviata -->
+  <section id="devCert" class="hidden">
+    <div class="steps">
+      <div class="step done"><div class="num">1</div>Account creato</div>
+      <div class="step active"><div class="num">2</div>Certificazione via email</div>
+      <div class="step"><div class="num">3</div>Carica certificato</div>
+      <div class="step"><div class="num">4</div>SDK inviato!</div>
+    </div>
+    <div class="card">
+      <h2><span class="mi">mail</span>Certificazione inviata</h2>
+      <p style="color:var(--muted); line-height:1.7;">Abbiamo inviato un'email a
+         <b id="certMail" style="color:var(--text)"></b> con:
+         <b style="color:var(--text)">il certificato in allegato</b> e <b style="color:var(--text)">il codice</b>.<br>
+         Apri l'email, scarica l'allegato, poi caricalo nel tuo account.</p>
+      <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn" onclick="openCertMail()"><span class="mi">mail</span>Apri la tua email</button>
+        <button class="btn ghost" onclick="gotoSettings()"><span class="mi">settings</span>Vai alle impostazioni</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stato: carica certificato + codice -->
+  <section id="devActivate" class="hidden">
+    <div class="steps">
+      <div class="step done"><div class="num">1</div>Account creato</div>
+      <div class="step done"><div class="num">2</div>Certificazione via email</div>
+      <div class="step active"><div class="num">3</div>Carica certificato</div>
+      <div class="step"><div class="num">4</div>SDK inviato!</div>
+    </div>
+    <div class="card" style="max-width:600px;">
+      <h2><span class="mi">settings</span>Impostazioni — Attiva la certificazione</h2>
+
+      <label>Certificato (l'allegato della email)</label>
+      <input type="file" id="certFile" accept=".cert,.crt,.pem,.txt" style="display:none;">
+      <div class="filebox" id="certDrop" onclick="document.getElementById('certFile').click()">
+        <span class="mi">upload</span>
+        <div><b>Carica il certificato</b><br><span style="font-size:12.5px;">kairo-certificate.cert ricevuto via email</span></div>
+      </div>
+      <div class="certok hidden" id="certOk"><span class="mi">check_circle</span>Certificato verificato. Ora inserisci il codice.</div>
+      <div class="errbar hidden" id="certErr"></div>
+
+      <label>Codice di certificazione (dalla email)</label>
+      <div style="display:flex; gap:9px;">
+        <input type="text" id="certInput" placeholder="es. A1B2C3" autocomplete="off">
+        <button class="btn" onclick="activateCert()"><span class="mi">verified_user</span>Attiva</button>
+      </div>
+      <div class="errbar hidden" id="codeErr"></div>
+      <div style="margin-top:18px;"><button class="btn ghost" onclick="openCertMail()"><span class="mi">mail</span>Rileggi l'email</button></div>
+    </div>
+  </section>
+
+  <!-- Stato: SDK inviato -->
+  <section id="devSdk" class="hidden">
+    <div class="steps">
+      <div class="step done"><div class="num">1</div>Account creato</div>
+      <div class="step done"><div class="num">2</div>Certificazione via email</div>
+      <div class="step done"><div class="num">3</div>Carica certificato</div>
+      <div class="step done active"><div class="num">4</div>SDK inviato!</div>
+    </div>
+    <div class="okbar"><span class="mi">check_circle</span>Certificazione attivata! L'SDK di KairoOS è stato inviato allo sviluppatore <b id="sdkUser" style="margin-left:4px;"></b>.</div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn big" onclick="openPortal()"><span class="mi">power_settings_new</span>Apri il Developer Portal</button>
+      <button class="btn ghost big" onclick="openSdkMail()"><span class="mi">mail</span>Rileggi l'email con l'SDK</button>
+    </div>
+  </section>
+
+  <!-- Developer Portal -->
+  <section id="devPortal" class="hidden">
+    <div class="wrap" style="padding-top:6px;">
+      <div class="portal">
+        <aside class="side">
+          <div class="stitle"><span class="mi">code</span>Developer Portal</div>
+          <div id="sideMenu"></div>
+        </aside>
+        <div class="panel" id="panelArea"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= EMAIL CERTIFICAZIONE ================= -->
+<div class="overlay hidden" id="certMailOverlay">
+  <div class="mail">
+    <div class="mhead">
+      <div class="mbadge"><img src="icons/kairo_logo.png"></div>
+      <div>
+        <b>certificazione@kairo.dev</b><br>
+        <span style="font-size:12px; color:var(--muted);">a: <span id="certMailTo"></span> — ora</span>
+      </div>
+    </div>
+    <div class="mbody">
+      <b>La tua certificazione developer Kairo</b>
+      <p style="margin-top:8px;">Ciao <b id="certMailUser"></b>, benvenuto nel Kairo Developer Program!
+         Trovi in allegato il <b>certificato</b> e qui sotto il <b>codice</b> per attivarlo.</p>
+      <div class="code" id="certMailCode"></div>
+      <p style="color:var(--muted); font-size:13px;">Come attivare:
+         1) scarica l'allegato · 2) caricalo nelle impostazioni del tuo account ·
+         3) inserisci il codice.</p>
+      <div class="attach">
+        <div class="afile"><span class="mi">verified_user</span></div>
+        <div style="flex:1;">
+          <b>kairo-certificate.cert</b><br>
+          <span style="font-size:12px; color:var(--muted);">Certificato developer personale</span>
+        </div>
+        <button class="btn" onclick="downloadCert()"><span class="mi">download</span>Scarica</button>
+      </div>
+    </div>
+    <div class="mfoot"><button class="btn ghost" onclick="closeCertMail()">Chiudi</button></div>
+  </div>
+</div>
+
+<!-- ================= EMAIL SDK (con allegato) ================= -->
+<div class="overlay hidden" id="sdkMailOverlay">
+  <div class="mail">
+    <div class="mhead">
+      <div class="mbadge"><img src="icons/kairo_logo.png"></div>
+      <div>
+        <b>sdk@kairo.dev</b><br>
+        <span style="font-size:12px; color:var(--muted);">a: <span id="sdkMailTo"></span> — ora</span>
+      </div>
+    </div>
+    <div class="mbody">
+      <b>Il tuo KairoSDK è pronto</b>
+      <p style="margin-top:8px;">Ciao <b id="sdkMailUser"></b>! Certificazione attivata:
+         ecco l'SDK per creare le tue app per KairoOS.</p>
+      <div style="background:var(--bg); border:1px solid var(--border); border-radius:13px; padding:18px; margin:14px 0;">
+        <b style="color:var(--accent);">Cosa contiene KairoSDK v0.1.0</b>
+        <ul class="sdklist">
+          <li><b>namespace <code>kec</code></b> — Kairo Easy Coding, il wrapper C++ facile</li>
+          <li><b>Canvas</b> — tela software per disegnare pixel, forme e testo</li>
+          <li><b>68 icone</b> built-in disegnate con più colori</li>
+          <li><b>66 suoni</b> e <b>10 tracce</b> di musica sintetizzate</li>
+          <li><b>30+ widget</b> UI: pulsanti, slider, barre, finestre</li>
+          <li><b>Temi</b> (scuro/chiaro) e C API in <code>KairoSDK.h</code></li>
+          <li>Una <b>dylib</b> macOS (Apple Silicon), <b>C++17</b>, nessuna dipendenza</li>
+        </ul>
+      </div>
+      <div class="attach">
+        <div class="afile"><span class="mi">download</span></div>
+        <div style="flex:1;">
+          <b>KairoSDK-v0.1.0.zip</b><br>
+          <span style="font-size:12px; color:var(--muted);">12 MB · framework + esempi + README</span>
+        </div>
+        <a class="btn" href="KairoSDK-v0.1.0.zip" download><span class="mi">download</span>Scarica</a>
+      </div>
+      <p style="color:var(--faint); font-size:12px; margin-top:10px;">
+        Scaricalo anche qui:
+        <a href="KairoSDK-v0.1.0.zip" download>KairoSDK-v0.1.0.zip</a></p>
+    </div>
+    <div class="mfoot"><button class="btn ghost" onclick="closeSdkMail()">Chiudi</button></div>
+  </div>
+</div>
+
+<script>
+/* ---------------- Stato (salvato nel browser) ---------------- */
+const LS = {
+  get: (k) => localStorage.getItem(k),
+  set: (k, v) => localStorage.setItem(k, v),
+};
+if (LS.get('kairo_store_v') !== '3') {
+  ['kairo_dev_user','kairo_dev_mail','kairo_dev_code','kairo_dev_cert','kairo_dev_active'].forEach(k=>localStorage.removeItem(k));
+  LS.set('kairo_store_v','3');
+}
+const dev = {
+  get user()     { return LS.get('kairo_dev_user')   || ''; },
+  get mail()     { return LS.get('kairo_dev_mail')   || ''; },
+  get code()     { return LS.get('kairo_dev_code')   || ''; },
+  get cert()     { return LS.get('kairo_dev_cert')   === '1'; },
+  get active()   { return LS.get('kairo_dev_active') === '1'; },
+};
+
+function genCode(){ return Math.random().toString(36).slice(2,6).toUpperCase() + Math.floor(10+Math.random()*89); }
+function hashSig(str){ let h = 5381; for (let i = 0; i < str.length; i++){ h = ((h << 5) + h + str.charCodeAt(i)) | 0; } return (h >>> 0).toString(16).toUpperCase().padStart(8, '0'); }
+
+function certText(){
+  const body =
+    'Name: ' + dev.user + '\n' +
+    'Email: ' + dev.mail + '\n' +
+    'Code: ' + dev.code + '\n' +
+    'Issued: ' + new Date().toISOString().slice(0,10) + '\n' +
+    'Signature: ' + hashSig(dev.user + '|' + dev.mail + '|' + dev.code);
+  return '-----BEGIN KAIRO DEVELOPER CERTIFICATE-----\n' + body + '\n-----END KAIRO DEVELOPER CERTIFICATE-----';
+}
+function verifyCert(text){
+  const m = /-----BEGIN KAIRO DEVELOPER CERTIFICATE-----([\s\S]*?)-----END KAIRO DEVELOPER CERTIFICATE-----/.exec(text);
+  if (!m) return { ok:false, why:'Non sembra un certificato Kairo.' };
+  const get = (k) => { const r = new RegExp('^' + k + ':\\s*(.+)$', 'm').exec(m[1]); return r ? r[1].trim() : ''; };
+  const name = get('Name'), mail = get('Email'), code = get('Code'), sig = get('Signature');
+  if (mail !== dev.mail) return { ok:false, why:'Questo certificato appartiene a un\'altra email.' };
+  if (code !== dev.code) return { ok:false, why:'Il codice nel certificato non è valido.' };
+  if (sig !== hashSig(name + '|' + mail + '|' + code)) return { ok:false, why:'La firma del certificato non è autentica.' };
+  return { ok:true };
+}
+
+/* ---------------- Menu del Developer Portal (50 voci, Material Icons) ---------------- */
+const MENU = [
+  {id:'app',        m:'apps',               n:'App'},
+  {id:'revisioned', m:'schedule',           n:'In revisione'},
+  {id:'analytics',  m:'insights',           n:'Analytics'},
+  {id:'payout',     m:'payments',           n:'Pagamenti'},
+  {id:'bank',       m:'account_balance',    n:'Dati bancari'},
+  {id:'cert',       m:'verified_user',      n:'Certificazione'},
+  {id:'team',       m:'groups',             n:'Team'},
+  {id:'builds',     m:'build',              n:'Build'},
+  {id:'releases',   m:'rocket_launch',      n:'Release'},
+  {id:'testing',    m:'science',            n:'Test'},
+  {id:'signing',    m:'draw',               n:'Firma'},
+  {id:'icons',      m:'image',              n:'Icone'},
+  {id:'screens',    m:'photo_camera',       n:'Screenshot'},
+  {id:'description',m:'description',        n:'Descrizione'},
+  {id:'pricing',    m:'sell',               n:'Prezzi'},
+  {id:'iap',        m:'shopping_cart',      n:'Acquisti in-app'},
+  {id:'subs',       m:'autorenew',          n:'Abbonamenti'},
+  {id:'ads',        m:'campaign',           n:'Pubblicità'},
+  {id:'reviews',    m:'rate_review',        n:'Recensioni'},
+  {id:'ratings',    m:'star',               n:'Valutazioni'},
+  {id:'crashes',    m:'bug_report',         n:'Crash report'},
+  {id:'perf',       m:'speed',              n:'Performance'},
+  {id:'privacy',    m:'privacy_tip',        n:'Privacy'},
+  {id:'safety',     m:'security',           n:'Data safety'},
+  {id:'target',     m:'track_changes',      n:'Targeting'},
+  {id:'localize',   m:'language',           n:'Localizzazione'},
+  {id:'translate',  m:'translate',          n:'Traduzioni'},
+  {id:'catalog',    m:'grid_view',          n:'Catalogo'},
+  {id:'listing',    m:'storefront',         n:'Store listing'},
+  {id:'experiment', m:'science',            n:'Esperimenti'},
+  {id:'rollout',    m:'trending_up',        n:'Rollout'},
+  {id:'badges',     m:'workspace_premium',  n:'Badge'},
+  {id:'early',      m:'rocket_launch',      n:'Early access'},
+  {id:'archive',    m:'inventory_2',        n:'Archivio'},
+  {id:'policies',   m:'policy',             n:'Politiche'},
+  {id:'legal',      m:'gavel',              n:'Legale'},
+  {id:'tax',        m:'receipt_long',       n:'Tasse'},
+  {id:'keys',       m:'key',                n:'Chiavi'},
+  {id:'creds',      m:'badge',              n:'Credenziali'},
+  {id:'apikey',     m:'vpn_key',            n:'API key'},
+  {id:'push',       m:'notifications_active', n:'Notifiche push'},
+  {id:'deep',       m:'link',               n:'Deep link'},
+  {id:'webhook',    m:'hub',                n:'Webhook'},
+  {id:'support',    m:'support_agent',      n:'Supporto'},
+  {id:'docs',       m:'menu_book',          n:'Documentazione'},
+  {id:'terms',      m:'article',            n:'Termini'},
+  {id:'history',    m:'history',            n:'Cronologia versioni'},
+  {id:'activity',   m:'list_alt',           n:'Registro attività'},
+  {id:'messages',   m:'mail',               n:'Messaggi'},
+  {id:'reports',    m:'assessment',         n:'Report'},
+];
+
+/* Le 68 icone built-in di KairoSDK (png reali, mostrate nel pannello Icone) */
+const ICONS = ['airplane','alarm','app','arrow-right','back','battery','bell','bluetooth','calendar',
+'camera','cart','check','clock','close','cloud','code','down','download','edit','eye','file','folder',
+'gift','heart','help','home','image','info','key','link','list','lock','logout','mail','menu','message',
+'mic','minus','moon','more','music','pause','phone','pin','play','plus','power','print','refresh','save',
+'search','send','settings','share','shield','signal','star','sun','terminal','trash','up','upload','user',
+'volume','wallet','warning','wifi','world'];
+
+/* ---------------- Navigazione ---------------- */
+function showPage(p){
+  document.getElementById('pageStore').classList.toggle('hidden', p!=='store');
+  document.getElementById('pageSdk').classList.toggle('hidden', p!=='sdk');
+  document.getElementById('pageDev').classList.toggle('hidden', p!=='dev');
+  document.getElementById('navStore').classList.toggle('on', p==='store');
+  document.getElementById('navSdk').classList.toggle('on', p==='sdk');
+  document.getElementById('navDev').classList.toggle('on', p==='dev');
+  if(p==='dev') renderDevState();
+}
+document.getElementById('navStore').onclick = ()=>showPage('store');
+document.getElementById('navSdk').onclick   = ()=>showPage('sdk');
+document.getElementById('navDev').onclick   = ()=>showPage('dev');
+
+/* ---------------- Flusso developer ---------------- */
+function renderDevState(){
+  if(dev.active){ showDevSdk(); return; }
+  if(dev.user && dev.code){ showActivate(); return; }
+  if(dev.user){ showCert(); return; }
+  showHome();
+}
+function setSections(){ for(const id of ['devHome','devCert','devActivate','devSdk','devPortal']) hide(id); }
+function showHome(){ setSections(); show('devHome'); }
+function showCert(){
+  setSections();
+  document.getElementById('certMail').textContent = dev.mail;
+  show('devCert');
+}
+function showActivate(){
+  setSections();
+  document.getElementById('certInput').value = '';
+  hide('certErr'); hide('codeErr'); hide('certOk');
+  if(dev.cert){ show('certOk'); }
+  show('devActivate');
+}
+function showDevSdk(){
+  setSections();
+  document.getElementById('sdkUser').textContent = dev.user;
+  updateChip(true);
+  show('devSdk');
+}
+function openPortal(){
+  setSections();
+  show('devPortal');
+  buildSidebar();
+  selectMenu('app');
+}
+
+/* Registrazione */
+document.getElementById('regForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const u = document.getElementById('regUser').value.trim();
+  const m = document.getElementById('regMail').value.trim();
+  LS.set('kairo_dev_user', u);
+  LS.set('kairo_dev_mail', m);
+  LS.set('kairo_dev_code', genCode());
+  LS.set('kairo_dev_cert','0');
+  LS.set('kairo_dev_active','0');
+  showCert();
+});
+
+/* Email certificazione */
+function openCertMail(){
+  document.getElementById('certMailTo').textContent   = dev.mail;
+  document.getElementById('certMailUser').textContent = dev.user;
+  document.getElementById('certMailCode').textContent = dev.code;
+  show('certMailOverlay');
+}
+function closeCertMail(){ hide('certMailOverlay'); }
+function downloadCert(){
+  const blob = new Blob([certText()], { type:'application/octet-stream' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'kairo-certificate-' + dev.user + '.cert';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+}
+
+/* Upload certificato nel account */
+document.getElementById('certFile').addEventListener('change', (ev)=>{
+  const f = ev.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const res = verifyCert(String(reader.result));
+    const err = document.getElementById('certErr');
+    if(res.ok){
+      LS.set('kairo_dev_cert','1');
+      hide('certErr'); show('certOk');
+    }else{
+      LS.set('kairo_dev_cert','0');
+      hide('certOk'); err.textContent = res.why; show('certErr');
+    }
+  };
+  reader.readAsText(f);
+});
+
+/* Impostazioni / attivazione */
+function gotoSettings(){ showActivate(); }
+function activateCert(){
+  const v = document.getElementById('certInput').value.trim().toUpperCase();
+  const codeErr = document.getElementById('codeErr');
+  if(!dev.cert){
+    codeErr.textContent = 'Prima carica il certificato ricevuto via email.';
+    show('codeErr');
+    return;
+  }
+  if(v === dev.code){
+    LS.set('kairo_dev_active','1');
+    hide('codeErr');
+    showDevSdk();
+  }else{
+    codeErr.textContent = 'Codice errato. Rileggi l\'email e riprova.';
+    show('codeErr');
+  }
+}
+
+/* Email SDK con allegato */
+function openSdkMail(){
+  document.getElementById('sdkMailTo').textContent   = dev.mail;
+  document.getElementById('sdkMailUser').textContent = dev.user;
+  show('sdkMailOverlay');
+}
+function closeSdkMail(){ hide('sdkMailOverlay'); }
+
+/* Portal sidebar + pannelli */
+function buildSidebar(){
+  document.getElementById('sideMenu').innerHTML = MENU.map(m=>
+    `<button data-id="${m.id}" onclick="selectMenu('${m.id}')"><span class="mi">${m.m}</span>${m.n}</button>`).join('');
+}
+function selectMenu(id){
+  document.querySelectorAll('#sideMenu button').forEach(b=>b.classList.toggle('on', b.dataset.id===id));
+  const item = MENU.find(m=>m.id===id);
+  const area = document.getElementById('panelArea');
+  if(id==='app'){
+    area.innerHTML = `
+      <h2><span class="mi">apps</span>Le tue app</h2>
+      <div class="sub">Le app che hai pubblicato su Kairo Store.</div>
+      <div class="empty" style="padding:44px 20px;">
+        <span class="mi">apps</span>
+        <b>Nessuna app pubblicata</b>
+        <p>Crea la tua prima app con KairoSDK e caricala qui.</p>
+      </div>`;
+  }else if(id==='revisioned'){
+    area.innerHTML = `
+      <h2><span class="mi">schedule</span>App in revisione</h2>
+      <div class="sub">Queste app stanno ancora passando la revisione.</div>
+      <div class="empty" style="padding:44px 20px;">
+        <span class="mi">schedule</span>
+        <b>Nessuna app in revisione</b>
+        <p>Quando invii un'app, la vedrai qui mentre viene revisionata.</p>
+      </div>`;
+  }else if(id==='icons'){
+    area.innerHTML = `
+      <h2><span class="mi">image</span>Icone</h2>
+      <div class="sub">Tutte le ${ICONS.length} icone built-in di KairoSDK. Clicca su un'icona per copiarne il nome.</div>
+      <input type="text" id="iconSearch" placeholder="Cerca un'icona..." oninput="filterIcons()">
+      <div class="igrid" id="iconGrid">${iconCells(ICONS)}</div>`;
+  }else{
+    area.innerHTML = `
+      <h2><span class="mi">${item.m}</span>${item.n}</h2>
+      <div class="sub">Kairo Developer Portal</div>
+      <div class="placeholder">
+        <span class="mi">more_horiz</span>
+        <div>Sezione "${item.n}" in costruzione.</div>
+      </div>`;
+  }
+}
+
+/* Pannello icone */
+function iconCells(list){
+  return list.map(n=>`<button class="icell" onclick="copyIcon('${n}')" title="Clicca per copiare il nome">
+      <img src="icons/${n}.png" alt="${n}"><span>${n}</span></button>`).join('');
+}
+function filterIcons(){
+  const q = document.getElementById('iconSearch').value.toLowerCase();
+  document.getElementById('iconGrid').innerHTML = iconCells(ICONS.filter(n=>n.includes(q)));
+}
+function copyIcon(name){
+  navigator.clipboard && navigator.clipboard.writeText(name);
+  toast('Copiata: ' + name);
+}
+
+/* ---------------- Utility ---------------- */
+function show(id){ document.getElementById(id).classList.remove('hidden'); }
+function hide(id){ document.getElementById(id).classList.add('hidden'); }
+function updateChip(visible){
+  document.getElementById('userChip').classList.toggle('hidden', !visible);
+  if(visible) document.getElementById('userName').textContent = dev.user;
+}
+function toast(msg){
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--surface);'+
+    'border:1px solid var(--accent);color:var(--text);padding:12px 22px;border-radius:12px;z-index:300;'+
+    'font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.5);';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 1800);
+}
+
+/* ---------------- Avvio ---------------- */
+updateChip(dev.user && dev.active);
+</script>
 </body>
 </html>
