@@ -443,6 +443,10 @@ async function sendMail(type, extra = {}){
     return { error: ex.message };
   }
 }
+function showDevErr(msg){
+  const e = document.getElementById('devErr');
+  if(e){ e.textContent = msg; e.classList.remove('hidden'); }
+}
 
 window.onerror = (msg) => { const e = document.getElementById('devErr'); if(e){ e.textContent = 'Errore JS: ' + msg; e.classList.remove('hidden'); } };
 
@@ -673,7 +677,7 @@ async function requestCert(){
   PROFILE.cert_code = code;
   showCert();
   const res = await sendMail('cert', { code });
-  if(res && res.error) toast('Certificazione pronta, ma l\'email non è partita: ' + res.error);
+  if(res && res.error) showDevErr('L\'EMAIL NON È PARTITA. Dettaglio: ' + res.error + '\nSe dice "invio fallito", controlla che l\'App Password sia giusta. Se dice "non autorizzato", riaccedi.');
   else toast('Certificazione richiesta: il codice è arrivato via email!');
 }
 function downloadCert(){
@@ -721,7 +725,7 @@ async function activateCert(){
     hide('codeErr');
     showDevSdk();
     const res = await sendMail('sdk');
-    if(res && res.error) toast('SDK pronto, ma l\'email non è partita: ' + res.error);
+    if(res && res.error) showDevErr('L\'EMAIL DELLO SDK NON È PARTITA. Dettaglio: ' + res.error);
     else toast('Certificazione attivata! L\'email con il link allo SDK è in arrivo.');
   }else{
     codeErr.textContent = 'Codice errato. Rivedi il tuo codice.';
