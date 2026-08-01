@@ -428,6 +428,21 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
 const SUPABASE_URL = 'https://skswsufsnxebebahnhtc.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrc3dzdWZzbnhlYmViYWhuaHRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1NTk4OTUsImV4cCI6MjEwMTEzNTg5NX0.G-zlyvK-Y8bzjMX6qCH_SUH_nOUPQh8HcPv2Eve--Cc';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const EDGE = SUPABASE_URL + '/functions/v1/send-mail';
+async function sendMail(type, extra = {}){
+  if(!SESSION) return { error:'non loggato' };
+  try{
+    const r = await fetch(EDGE, {
+      method:'POST',
+      headers:{ 'Authorization':'Bearer ' + SESSION.access_token, 'Content-Type':'application/json' },
+      body: JSON.stringify(Object.assign({ type, username: PROFILE ? PROFILE.username : 'developer' }, extra))
+    });
+    const d = await r.json().catch(()=>({}));
+    return r.ok ? d : { error: d.error || ('HTTP ' + r.status) };
+  }catch(ex){
+    return { error: ex.message };
+  }
+}
 
 window.onerror = (msg) => { const e = document.getElementById('devErr'); if(e){ e.textContent = 'Errore JS: ' + msg; e.classList.remove('hidden'); } };
 
@@ -657,7 +672,9 @@ async function requestCert(){
   if(error){ toast('Errore: ' + error.message); return; }
   PROFILE.cert_code = code;
   showCert();
-  toast('Certificazione richiesta');
+  const res = await sendMail('cert', { code });
+  if(res && res.error) toast('Certificazione pronta, ma l\'email non è partita: ' + res.error);
+  else toast('Certificazione richiesta: il codice è arrivato via email!');
 }
 function downloadCert(){
   const blob = new Blob([certText()], { type:'application/octet-stream' });
@@ -703,6 +720,9 @@ async function activateCert(){
     PROFILE.certified = true;
     hide('codeErr');
     showDevSdk();
+    const res = await sendMail('sdk');
+    if(res && res.error) toast('SDK pronto, ma l\'email non è partita: ' + res.error);
+    else toast('Certificazione attivata! L\'email con il link allo SDK è in arrivo.');
   }else{
     codeErr.textContent = 'Codice errato. Rivedi il tuo codice.';
     show('codeErr');
