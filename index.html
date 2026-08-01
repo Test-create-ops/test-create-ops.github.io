@@ -336,16 +336,14 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
     <div class="card">
       <h2><span class="mi">verified_user</span>Certificazione developer</h2>
       <p style="color:var(--muted); line-height:1.7;">La certificazione dimostra che sei un vero developer Kairo.
-         Richiedendola ricevi un <b style="color:var(--text)">codice personale</b> (salvato nel tuo account)
+         Richiedendola ricevi un <b style="color:var(--text)">codice personale via email</b> (salvato nel tuo account)
          e il <b style="color:var(--text)">certificato</b> da scaricare.</p>
       <div style="margin-top:20px;">
         <button class="btn big" onclick="requestCert()"><span class="mi">verified_user</span>Richiedi la certificazione</button>
       </div>
       <div class="hidden" id="certResult" style="margin-top:22px;">
         <div class="okbar"><span class="mi">check_circle</span>Certificazione richiesta per <b id="certUser" style="margin-left:4px;"></b></div>
-        <label>Il tuo codice di certificazione</label>
-        <div class="code" id="certCodeShown"></div>
-        <p style="color:var(--muted); font-size:13px; line-height:1.7;">Il codice è salvato nel tuo account.
+        <p style="color:var(--muted); font-size:13px; line-height:1.7;">Controlla la tua email: il tuo codice personale è in arrivo da "Kairo Store".
            Il certificato lo scarichi qui:</p>
         <button class="btn ghost" onclick="downloadCert()"><span class="mi">download</span>Scarica il certificato</button>
         <div style="margin-top:18px;"><button class="btn" onclick="gotoSettings()"><span class="mi">settings</span>Vai ad attivarla</button></div>
@@ -373,13 +371,12 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
       <div class="certok hidden" id="certOk"><span class="mi">check_circle</span>Certificato verificato. Ora inserisci il codice.</div>
       <div class="errbar hidden" id="certErr"></div>
 
-      <label>Codice di certificazione (il tuo, del tuo account)</label>
+      <label>Codice di certificazione (lo trovi nella email che hai ricevuto)</label>
       <div style="display:flex; gap:9px;">
         <input type="text" id="certInput" placeholder="es. A1B2C3" autocomplete="off">
         <button class="btn" onclick="activateCert()"><span class="mi">verified_user</span>Attiva</button>
       </div>
       <div class="errbar hidden" id="codeErr"></div>
-      <div style="margin-top:18px;"><button class="btn ghost" onclick="showCert()"><span class="mi">verified_user</span>Rivedi il tuo codice</button></div>
     </div>
   </section>
 
@@ -604,7 +601,6 @@ function showCert(){
   setSections();
   if(!PROFILE){ show('devHome'); return; }
   document.getElementById('certUser').textContent = PROFILE.username;
-  document.getElementById('certCodeShown').textContent = PROFILE.cert_code || '';
   document.getElementById('certResult').classList.toggle('hidden', !PROFILE.cert_code);
   show('devCert');
 }
