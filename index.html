@@ -549,7 +549,12 @@ async function renderDevState(){
   await refreshSession();
   if(!SESSION){ setSections(); show('devHome'); updateChip(false); return; }
   await refreshProfile();
-  if(!PROFILE){ setSections(); show('devHome'); updateChip(false); return; }
+  if(!PROFILE){
+    const uname = 'user-' + SESSION.user.id.slice(0,8);
+    const { data, error } = await sb.from('profiles').upsert({ id: SESSION.user.id, username: uname }).select().single();
+    PROFILE = data || null;
+  }
+  if(!PROFILE){ setSections(); show('devHome'); updateChip(true); return; }
   updateChip(true);
   if(PROFILE.certified){ showDevSdk(); return; }
   if(PROFILE.cert_code){ showActivate(); return; }
@@ -564,7 +569,7 @@ function showConfirm(){
 }
 function showCert(){
   setSections();
-  if(!PROFILE) return;
+  if(!PROFILE){ show('devHome'); return; }
   document.getElementById('certUser').textContent = PROFILE.username;
   document.getElementById('certCodeShown').textContent = PROFILE.cert_code || '';
   document.getElementById('certResult').classList.toggle('hidden', !PROFILE.cert_code);
@@ -572,13 +577,15 @@ function showCert(){
 }
 function showActivate(){
   setSections();
+  if(!PROFILE){ show('devHome'); return; }
   document.getElementById('certInput').value = '';
   hide('certErr'); hide('codeErr'); hide('certOk');
   show('devActivate');
 }
 function showDevSdk(){
   setSections();
-  document.getElementById('sdkUser').textContent = PROFILE ? PROFILE.username : '';
+  if(!PROFILE){ show('devHome'); return; }
+  document.getElementById('sdkUser').textContent = PROFILE.username;
   updateChip(true);
   show('devSdk');
 }
@@ -614,14 +621,7 @@ async function doAuth(e){
     if(authTab === 'signup'){
       const { error } = await sb.auth.signUp({ email:m, password:p, options:{ data:{ username:u } } });
       if(error) throw error;
-      await refreshSession();
-      if(SESSION){
-        await refreshProfile();
-        updateChip(true);
-        if(PROFILE && PROFILE.cert_code){ showActivate(); } else { showCert(); }
-      }else{
-        showConfirm();
-      }
+      await renderDevState();
     }else{
       const { error } = await sb.auth.signInWithPassword({ email:m, password:p });
       if(error) throw error;
