@@ -287,6 +287,8 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
 <!-- ================= DEVELOPERS ================= -->
 <main id="pageDev" class="wrap hidden">
 
+  <div class="errbar hidden" id="devErr" style="background:rgba(243,139,168,.12); border:1px solid var(--error); padding:14px 18px; border-radius:12px; margin-bottom:16px; font-size:13px; white-space:pre-wrap;"></div>
+
   <!-- Stato: non registrato -->
   <section id="devHome">
     <div class="hero">
@@ -427,6 +429,8 @@ const SUPABASE_URL = 'https://skswsufsnxebebahnhtc.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrc3dzdWZzbnhlYmViYWhuaHRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1NTk4OTUsImV4cCI6MjEwMTEzNTg5NX0.G-zlyvK-Y8bzjMX6qCH_SUH_nOUPQh8HcPv2Eve--Cc';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+window.onerror = (msg) => { const e = document.getElementById('devErr'); if(e){ e.textContent = 'Errore JS: ' + msg; e.classList.remove('hidden'); } };
+
 let PROFILE = null;
 let SESSION = null;
 /* ---------------- Autenticazione e profilo (account reali) ---------------- */
@@ -545,20 +549,29 @@ document.getElementById('navSdk').onclick   = ()=>showPage('sdk');
 document.getElementById('navDev').onclick   = ()=>showPage('dev');
 
 /* ---------------- Flusso developer (account reali) ---------------- */
+function showDevErr(msg){
+  const e = document.getElementById('devErr');
+  if(e){ e.textContent = 'Errore: ' + msg; e.classList.remove('hidden'); }
+}
 async function renderDevState(){
-  await refreshSession();
-  if(!SESSION){ setSections(); show('devHome'); updateChip(false); return; }
-  await refreshProfile();
-  if(!PROFILE){
-    const uname = 'user-' + SESSION.user.id.slice(0,8);
-    const { data, error } = await sb.from('profiles').upsert({ id: SESSION.user.id, username: uname }).select().single();
-    PROFILE = data || null;
+  try{
+    await refreshSession();
+    if(!SESSION){ setSections(); show('devHome'); updateChip(false); return; }
+    await refreshProfile();
+    if(!PROFILE){
+      const uname = 'user-' + SESSION.user.id.slice(0,8);
+      const { data, error } = await sb.from('profiles').upsert({ id: SESSION.user.id, username: uname }).select().single();
+      PROFILE = data || null;
+    }
+    if(!PROFILE){ setSections(); show('devHome'); updateChip(true); return; }
+    updateChip(true);
+    if(PROFILE.certified){ showDevSdk(); return; }
+    if(PROFILE.cert_code){ showActivate(); return; }
+    showCert();
+  }catch(ex){
+    showDevErr(ex && (ex.message || ex.toString()) || 'errore sconosciuto');
+    setSections(); show('devHome');
   }
-  if(!PROFILE){ setSections(); show('devHome'); updateChip(true); return; }
-  updateChip(true);
-  if(PROFILE.certified){ showDevSdk(); return; }
-  if(PROFILE.cert_code){ showActivate(); return; }
-  showCert();
 }
 function setSections(){ for(const id of ['devHome','devConfirm','devCert','devActivate','devSdk','devPortal']) hide(id); }
 function showHome(){ setSections(); show('devHome'); }
