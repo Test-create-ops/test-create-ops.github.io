@@ -720,8 +720,12 @@ function logout(){
 }
 
 sb.auth.onAuthStateChange((event) => {
-  if(currentPage === 'dev' && ['SIGNED_IN','SIGNED_OUT','USER_UPDATED','TOKEN_REFRESHED'].includes(event)){
-    renderDevState();
+  if(['SIGNED_IN','SIGNED_OUT','USER_UPDATED','TOKEN_REFRESHED'].includes(event)){
+    if(currentPage === 'dev'){
+      renderDevState();
+    }else if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
+      showPage('dev');
+    }
   }
 });
 
