@@ -232,11 +232,10 @@
   <div class="card" style="margin-bottom:30px;">
     <h2><span class="mi">terminal</span>Il tuo primo programma in 6 righe</h2>
     <pre><code><span class="kw">#include</span> <span class="str">"KairoECC.h"</span>
-<span class="kw">using namespace</span> <span class="ns">kec</span>;
 
-<span class="ns">Canvas</span> c(320, 240);
-c.clear(<span class="ns">White</span>);
-c.icon(<span class="lit">"heart"</span>, 100, 100, 32, <span class="ns">Red</span>);   <span class="cm">// disegna un cuore</span>
+<span class="ns">kec</span>::Canvas c(320, 240);
+c.clear(<span class="ns">kec</span>::White);
+c.icon(<span class="lit">"heart"</span>, 100, 100, 32, <span class="ns">kec</span>::Red);   <span class="cm">// disegna un cuore</span>
 c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
     <p style="color:var(--muted); margin-top:16px; font-size:14px; line-height:1.7;">
       Tutto vive nel <b style="color:var(--text)">namespace <code style="color:var(--accent)">kec</code></b>:
