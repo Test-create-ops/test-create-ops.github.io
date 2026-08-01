@@ -488,6 +488,7 @@ function verifyCert(text){
 
 /* ---------------- Menu del Developer Portal (50 voci, Material Icons) ---------------- */
 const MENU = [
+  {id:'guide',      m:'menu_book',          n:'Come sviluppare'},
   {id:'app',        m:'apps',               n:'App'},
   {id:'publish',    m:'upload',             n:'Pubblica'},
   {id:'revisioned', m:'schedule',           n:'In revisione'},
@@ -769,6 +770,13 @@ function selectMenu(id){
     area.innerHTML = `
       <h2><span class="mi">upload</span>Pubblica un'app</h2>
       <div class="sub">Prepara i file dell'app da pubblicare su Kairo Store. Ogni pubblicazione passa prima dalla revisione.</div>
+      <div class="card" style="margin-bottom:18px; border-color:var(--accent);">
+        <h2><span class="mi">code</span>Prima di pubblicare</h2>
+        <p style="color:var(--muted); font-size:13.5px; line-height:1.9;">
+          Le app devono essere sviluppate in <b style="color:var(--text)">C</b> dentro <b style="color:var(--text)">VS Code</b>.
+          Se preferisci avere già tutto preparato, <b style="color:var(--text)">KairoCode</b>, l'IDE di Kairo, è perfetto.
+        </p>
+      </div>
       <form id="pubForm" onsubmit="return buildManifest()">
         <label>Nome dell'app</label>
         <input type="text" id="pubName" placeholder="es. Il Mio Gioco" required>
@@ -795,6 +803,37 @@ function selectMenu(id){
           4. Appena approvata, l'app compare nello store con il bottone <b style="color:var(--text)">Installa</b>.
         </p>
         <a class="btn ghost" href="https://github.com/Test-create-ops/kairo-store-catalog" target="_blank" rel="noopener" style="margin-top:6px;"><span class="mi">code</span>Apri la repo del catalogo</a>
+      </div>`;
+    return;
+  }else if(id==='guide' || id==='docs'){
+    area.innerHTML = `
+      <h2><span class="mi">menu_book</span>Come si sviluppano le app</h2>
+      <div class="sub">Tutto quello che serve per creare e pubblicare app su Kairo Store.</div>
+      <div class="card">
+        <h2><span class="mi">code</span>Linguaggio e strumenti</h2>
+        <p style="color:var(--muted); font-size:13.5px; line-height:1.9;">
+          Le app di Kairo Store devono essere sviluppate in <b style="color:var(--text)">C</b>,
+          con l'editor <b style="color:var(--text)">VS Code</b>, usando il <b style="color:var(--text)">KairoSDK</b>.<br>
+          Se vuoi trovare già tutto preparato, <b style="color:var(--text)">KairoCode</b> è l'IDE perfetto:
+          ti dà l'ambiente completo per scrivere, compilare e testare subito, senza configurare nulla.
+        </p>
+      </div>
+      <div class="card">
+        <h2><span class="mi">verified_user</span>Passaggi per diventare developer</h2>
+        <p style="color:var(--muted); font-size:13.5px; line-height:1.9;">
+          1. Registrati e conferma l'email reale.<br>
+          2. Richiedi la certificazione: il codice personale arriva via email.<br>
+          3. Attivala inserendo il codice (e caricando il certificato).<br>
+          4. Scarica il KairoSDK e inizia a creare.
+        </p>
+      </div>
+      <div class="card">
+        <h2><span class="mi">upload</span>Pubblicare un'app</h2>
+        <p style="color:var(--muted); font-size:13.5px; line-height:1.9;">
+          Dal pannello <b style="color:var(--text)">Pubblica</b> scarichi il <b style="color:var(--text)">manifest.json</b>,
+          crei una pull request sulla repo del catalogo e dopo la revisione
+          l'app compare nello store con il bottone <b style="color:var(--text)">Installa</b>.
+        </p>
       </div>`;
     return;
   }else if(id==='icons'){
