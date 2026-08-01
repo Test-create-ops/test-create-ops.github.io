@@ -432,10 +432,11 @@ const EDGE = SUPABASE_URL + '/functions/v1/send-mail';
 async function sendMail(type, extra = {}){
   if(!SESSION) return { error:'non loggato' };
   try{
+    const body = JSON.stringify(Object.assign({ token: SESSION.access_token, type, username: PROFILE ? PROFILE.username : 'developer' }, extra));
     const r = await fetch(EDGE, {
       method:'POST',
-      headers:{ 'Authorization':'Bearer ' + SESSION.access_token, 'Content-Type':'application/json' },
-      body: JSON.stringify(Object.assign({ type, username: PROFILE ? PROFILE.username : 'developer' }, extra))
+      headers:{ 'Content-Type':'text/plain' },
+      body
     });
     const d = await r.json().catch(()=>({}));
     return r.ok ? d : { error: d.error || ('HTTP ' + r.status) };
