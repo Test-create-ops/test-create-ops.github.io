@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kairo Store — Developers</title>
 <link rel="icon" href="icons/kairo_logo.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   @font-face{
     font-family:'Material Icons';
@@ -72,6 +73,13 @@
   .card h2 .mi{font-size:22px; color:var(--accent);}
 
   label{display:block; font-size:13px; color:var(--muted); margin:14px 0 6px; font-weight:600;}
+  .tabs{display:flex; gap:8px; margin-bottom:8px; background:var(--bg); border:1px solid var(--border);
+        border-radius:12px; padding:5px;}
+  .tabs button{flex:1; display:flex; align-items:center; justify-content:center; gap:8px;
+               background:transparent; border:none; color:var(--muted); padding:10px; border-radius:9px;
+               font-size:14px; font-weight:700; transition:background .12s, color .12s;}
+  .tabs button .mi{font-size:18px;}
+  .tabs button.on{background:var(--button); color:var(--accent);}
   input[type=text],input[type=email],input[type=password]{
     width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--border);
     background:var(--bg); color:var(--text); font-size:14px; transition:border-color .15s;}
@@ -204,6 +212,11 @@
   </nav>
   <div class="spacer"></div>
   <div class="userchip hidden" id="userChip"><span class="dot"></span><span id="userName">—</span></div>
+  <button id="btnLogout" class="hidden" onclick="logout()" title="Esci"
+          style="background:var(--button); color:var(--text); border-radius:999px;
+                 width:36px; height:36px; display:flex; align-items:center; justify-content:center; border:none;">
+    <span class="mi">logout</span>
+  </button>
 </header>
 
 <!-- ================= STORE ================= -->
@@ -263,10 +276,10 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
   <div class="card">
     <h2><span class="mi">verified_user</span>Come si riceve l'SDK</h2>
     <p style="color:var(--muted); line-height:1.8; margin-bottom:18px; font-size:14px;">
-      1. Crea un account nella pagina <b style="color:var(--text)">Developers</b>.<br>
-      2. Ricevi via email la <b style="color:var(--text)">certificazione</b> con allegato: scarichi il certificato e lo carichi nel tuo account.<br>
-      3. Inserisci il <b style="color:var(--text)">codice</b> fornito nella stessa email.<br>
-      4. Certificazione attivata: ti arriva l'<b style="color:var(--text)">SDK</b> in allegato via email. </p>
+      1. Registrati nella pagina <b style="color:var(--text)">Developers</b> e conferma la tua email.<br>
+      2. Dal tuo account richiedi la <b style="color:var(--text)">certificazione</b>: ricevi il <b style="color:var(--text)">codice</b> e scarichi il <b style="color:var(--text)">certificato</b>.<br>
+      3. Carica il certificato e inserisci il codice per attivarla.<br>
+      4. Attivata: scarichi l'<b style="color:var(--text)">SDK</b> direttamente dal tuo account. </p>
     <button class="btn" onclick="showPage('dev')"><span class="mi">person</span>Vai a Developers</button>
   </div>
 </main>
@@ -279,40 +292,61 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
     <div class="hero">
       <span class="badge"><span class="mi">verified_user</span>Developer Program</span>
       <h1>Porta le tue app su <b>KairoOS</b>.</h1>
-      <p>Crea un account developer, ricevi la certificazione via email e attivala
-         caricando il certificato nel tuo account. Solo i developer certificati ricevono l'SDK.</p>
+      <p>Accedi al tuo account developer. Alla registrazione ricevi una <b>email di conferma reale</b>.
+         Poi richiedi la certificazione e attivala per ricevere l'SDK.</p>
     </div>
     <div class="card" style="max-width:520px;">
-      <h2><span class="mi">person</span>Crea il tuo account developer</h2>
+      <div class="tabs" id="authTabs">
+        <button id="tabSignup" class="on" onclick="setAuthTab('signup')"><span class="mi">person_add</span>Registrati</button>
+        <button id="tabLogin" onclick="setAuthTab('login')"><span class="mi">login</span>Accedi</button>
+      </div>
       <form id="regForm">
-        <label>Nome utente</label>
-        <input type="text" id="regUser" placeholder="es. kairokid" required>
+        <label id="userLabel">Nome utente</label>
+        <input type="text" id="regUser" placeholder="es. kairokid" autocomplete="username">
         <label>Email</label>
-        <input type="email" id="regMail" placeholder="es. tu@email.com" required>
+        <input type="email" id="regMail" placeholder="es. tu@email.com" autocomplete="email">
         <label>Password</label>
-        <input type="password" id="regPass" placeholder="••••••••" required>
-        <div style="margin-top:20px;"><button class="btn big" type="submit"><span class="mi">arrow_forward</span>Crea account</button></div>
+        <input type="password" id="regPass" placeholder="••••••••" autocomplete="new-password">
+        <div class="errbar hidden" id="authErr"></div>
+        <div style="margin-top:20px;"><button class="btn big" type="submit" id="regSubmit"><span class="mi">arrow_forward</span>Crea account</button></div>
       </form>
     </div>
   </section>
 
-  <!-- Stato: certificazione inviata -->
+  <!-- Stato: email di conferma (dopo registrazione) -->
+  <section id="devConfirm" class="hidden">
+    <div class="card" style="max-width:560px;">
+      <h2><span class="mi">mail</span>Controlla la tua email</h2>
+      <p style="color:var(--muted); line-height:1.7;">Abbiamo inviato un'email di conferma a
+         <b id="confirmMail" style="color:var(--text)"></b>.<br>
+         Apri l'email e clicca sul link per attivare il tuo account. Poi torna qui e ricarica la pagina.</p>
+    </div>
+  </section>
+
+  <!-- Stato: richiedi certificazione -->
   <section id="devCert" class="hidden">
     <div class="steps">
-      <div class="step done"><div class="num">1</div>Account creato</div>
-      <div class="step active"><div class="num">2</div>Certificazione via email</div>
-      <div class="step"><div class="num">3</div>Carica certificato</div>
-      <div class="step"><div class="num">4</div>SDK inviato!</div>
+      <div class="step done"><div class="num">1</div>Account attivo</div>
+      <div class="step active"><div class="num">2</div>Richiedi certificazione</div>
+      <div class="step"><div class="num">3</div>Attiva con il codice</div>
+      <div class="step"><div class="num">4</div>SDK ricevuto!</div>
     </div>
     <div class="card">
-      <h2><span class="mi">mail</span>Certificazione inviata</h2>
-      <p style="color:var(--muted); line-height:1.7;">Abbiamo inviato un'email a
-         <b id="certMail" style="color:var(--text)"></b> con:
-         <b style="color:var(--text)">il certificato in allegato</b> e <b style="color:var(--text)">il codice</b>.<br>
-         Apri l'email, scarica l'allegato, poi caricalo nel tuo account.</p>
-      <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn" onclick="openCertMail()"><span class="mi">mail</span>Apri la tua email</button>
-        <button class="btn ghost" onclick="gotoSettings()"><span class="mi">settings</span>Vai alle impostazioni</button>
+      <h2><span class="mi">verified_user</span>Certificazione developer</h2>
+      <p style="color:var(--muted); line-height:1.7;">La certificazione dimostra che sei un vero developer Kairo.
+         Richiedendola ricevi un <b style="color:var(--text)">codice personale</b> (salvato nel tuo account)
+         e il <b style="color:var(--text)">certificato</b> da scaricare.</p>
+      <div style="margin-top:20px;">
+        <button class="btn big" onclick="requestCert()"><span class="mi">verified_user</span>Richiedi la certificazione</button>
+      </div>
+      <div class="hidden" id="certResult" style="margin-top:22px;">
+        <div class="okbar"><span class="mi">check_circle</span>Certificazione richiesta per <b id="certUser" style="margin-left:4px;"></b></div>
+        <label>Il tuo codice di certificazione</label>
+        <div class="code" id="certCodeShown"></div>
+        <p style="color:var(--muted); font-size:13px; line-height:1.7;">Il codice è salvato nel tuo account.
+           Il certificato lo scarichi qui:</p>
+        <button class="btn ghost" onclick="downloadCert()"><span class="mi">download</span>Scarica il certificato</button>
+        <div style="margin-top:18px;"><button class="btn" onclick="gotoSettings()"><span class="mi">settings</span>Vai ad attivarla</button></div>
       </div>
     </div>
   </section>
@@ -320,45 +354,56 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
   <!-- Stato: carica certificato + codice -->
   <section id="devActivate" class="hidden">
     <div class="steps">
-      <div class="step done"><div class="num">1</div>Account creato</div>
-      <div class="step done"><div class="num">2</div>Certificazione via email</div>
-      <div class="step active"><div class="num">3</div>Carica certificato</div>
-      <div class="step"><div class="num">4</div>SDK inviato!</div>
+      <div class="step done"><div class="num">1</div>Account attivo</div>
+      <div class="step done"><div class="num">2</div>Certificazione richiesta</div>
+      <div class="step active"><div class="num">3</div>Attiva con il codice</div>
+      <div class="step"><div class="num">4</div>SDK ricevuto!</div>
     </div>
     <div class="card" style="max-width:600px;">
       <h2><span class="mi">settings</span>Impostazioni — Attiva la certificazione</h2>
 
-      <label>Certificato (l'allegato della email)</label>
+      <label>Certificato (il file che hai scaricato)</label>
       <input type="file" id="certFile" accept=".cert,.crt,.pem,.txt" style="display:none;">
       <div class="filebox" id="certDrop" onclick="document.getElementById('certFile').click()">
         <span class="mi">upload</span>
-        <div><b>Carica il certificato</b><br><span style="font-size:12.5px;">kairo-certificate.cert ricevuto via email</span></div>
+        <div><b>Carica il certificato</b><br><span style="font-size:12.5px;">il tuo kairo-certificate-*.cert scaricato qui sopra</span></div>
       </div>
       <div class="certok hidden" id="certOk"><span class="mi">check_circle</span>Certificato verificato. Ora inserisci il codice.</div>
       <div class="errbar hidden" id="certErr"></div>
 
-      <label>Codice di certificazione (dalla email)</label>
+      <label>Codice di certificazione (il tuo, del tuo account)</label>
       <div style="display:flex; gap:9px;">
         <input type="text" id="certInput" placeholder="es. A1B2C3" autocomplete="off">
         <button class="btn" onclick="activateCert()"><span class="mi">verified_user</span>Attiva</button>
       </div>
       <div class="errbar hidden" id="codeErr"></div>
-      <div style="margin-top:18px;"><button class="btn ghost" onclick="openCertMail()"><span class="mi">mail</span>Rileggi l'email</button></div>
+      <div style="margin-top:18px;"><button class="btn ghost" onclick="showCert()"><span class="mi">verified_user</span>Rivedi il tuo codice</button></div>
     </div>
   </section>
 
-  <!-- Stato: SDK inviato -->
+  <!-- Stato: SDK ricevuto -->
   <section id="devSdk" class="hidden">
     <div class="steps">
-      <div class="step done"><div class="num">1</div>Account creato</div>
-      <div class="step done"><div class="num">2</div>Certificazione via email</div>
-      <div class="step done"><div class="num">3</div>Carica certificato</div>
-      <div class="step done active"><div class="num">4</div>SDK inviato!</div>
+      <div class="step done"><div class="num">1</div>Account attivo</div>
+      <div class="step done"><div class="num">2</div>Certificazione richiesta</div>
+      <div class="step done"><div class="num">3</div>Attivata con il codice</div>
+      <div class="step done active"><div class="num">4</div>SDK ricevuto!</div>
     </div>
-    <div class="okbar"><span class="mi">check_circle</span>Certificazione attivata! L'SDK di KairoOS è stato inviato allo sviluppatore <b id="sdkUser" style="margin-left:4px;"></b>.</div>
+    <div class="okbar"><span class="mi">check_circle</span>Certificazione attivata! Benvenuto nel Developer Program, <b id="sdkUser" style="margin-left:4px;"></b>.</div>
+    <div class="card" style="margin:18px 0;">
+      <h2><span class="mi">download</span>Il tuo KairoSDK v0.1.0</h2>
+      <p style="color:var(--muted); line-height:1.7;">Ecco il framework Kairo per creare le tue app: namespace <b style="color:var(--text)">kec</b>, Canvas, 68 icone, 66 suoni, 10 tracce, 30+ widget.</p>
+      <div class="attach">
+        <div class="afile"><span class="mi">download</span></div>
+        <div style="flex:1;">
+          <b>KairoSDK-v0.1.0.zip</b><br>
+          <span style="font-size:12px; color:var(--muted);">12 MB · framework + esempi + README</span>
+        </div>
+        <a class="btn" href="KairoSDK-v0.1.0.zip" download><span class="mi">download</span>Scarica</a>
+      </div>
+    </div>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn big" onclick="openPortal()"><span class="mi">power_settings_new</span>Apri il Developer Portal</button>
-      <button class="btn ghost big" onclick="openSdkMail()"><span class="mi">mail</span>Rileggi l'email con l'SDK</button>
     </div>
   </section>
 
@@ -376,107 +421,37 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
   </section>
 </main>
 
-<!-- ================= EMAIL CERTIFICAZIONE ================= -->
-<div class="overlay hidden" id="certMailOverlay">
-  <div class="mail">
-    <div class="mhead">
-      <div class="mbadge"><img src="icons/kairo_logo.png"></div>
-      <div>
-        <b>certificazione@kairo.dev</b><br>
-        <span style="font-size:12px; color:var(--muted);">a: <span id="certMailTo"></span> — ora</span>
-      </div>
-    </div>
-    <div class="mbody">
-      <b>La tua certificazione developer Kairo</b>
-      <p style="margin-top:8px;">Ciao <b id="certMailUser"></b>, benvenuto nel Kairo Developer Program!
-         Trovi in allegato il <b>certificato</b> e qui sotto il <b>codice</b> per attivarlo.</p>
-      <div class="code" id="certMailCode"></div>
-      <p style="color:var(--muted); font-size:13px;">Come attivare:
-         1) scarica l'allegato · 2) caricalo nelle impostazioni del tuo account ·
-         3) inserisci il codice.</p>
-      <div class="attach">
-        <div class="afile"><span class="mi">verified_user</span></div>
-        <div style="flex:1;">
-          <b>kairo-certificate.cert</b><br>
-          <span style="font-size:12px; color:var(--muted);">Certificato developer personale</span>
-        </div>
-        <button class="btn" onclick="downloadCert()"><span class="mi">download</span>Scarica</button>
-      </div>
-    </div>
-    <div class="mfoot"><button class="btn ghost" onclick="closeCertMail()">Chiudi</button></div>
-  </div>
-</div>
-
-<!-- ================= EMAIL SDK (con allegato) ================= -->
-<div class="overlay hidden" id="sdkMailOverlay">
-  <div class="mail">
-    <div class="mhead">
-      <div class="mbadge"><img src="icons/kairo_logo.png"></div>
-      <div>
-        <b>sdk@kairo.dev</b><br>
-        <span style="font-size:12px; color:var(--muted);">a: <span id="sdkMailTo"></span> — ora</span>
-      </div>
-    </div>
-    <div class="mbody">
-      <b>Il tuo KairoSDK è pronto</b>
-      <p style="margin-top:8px;">Ciao <b id="sdkMailUser"></b>! Certificazione attivata:
-         ecco l'SDK per creare le tue app per KairoOS.</p>
-      <div style="background:var(--bg); border:1px solid var(--border); border-radius:13px; padding:18px; margin:14px 0;">
-        <b style="color:var(--accent);">Cosa contiene KairoSDK v0.1.0</b>
-        <ul class="sdklist">
-          <li><b>namespace <code>kec</code></b> — Kairo Easy Coding, il wrapper C++ facile</li>
-          <li><b>Canvas</b> — tela software per disegnare pixel, forme e testo</li>
-          <li><b>68 icone</b> built-in disegnate con più colori</li>
-          <li><b>66 suoni</b> e <b>10 tracce</b> di musica sintetizzate</li>
-          <li><b>30+ widget</b> UI: pulsanti, slider, barre, finestre</li>
-          <li><b>Temi</b> (scuro/chiaro) e C API in <code>KairoSDK.h</code></li>
-          <li>Una <b>dylib</b> macOS (Apple Silicon), <b>C++17</b>, nessuna dipendenza</li>
-        </ul>
-      </div>
-      <div class="attach">
-        <div class="afile"><span class="mi">download</span></div>
-        <div style="flex:1;">
-          <b>KairoSDK-v0.1.0.zip</b><br>
-          <span style="font-size:12px; color:var(--muted);">12 MB · framework + esempi + README</span>
-        </div>
-        <a class="btn" href="KairoSDK-v0.1.0.zip" download><span class="mi">download</span>Scarica</a>
-      </div>
-      <p style="color:var(--faint); font-size:12px; margin-top:10px;">
-        Scaricalo anche qui:
-        <a href="KairoSDK-v0.1.0.zip" download>KairoSDK-v0.1.0.zip</a></p>
-    </div>
-    <div class="mfoot"><button class="btn ghost" onclick="closeSdkMail()">Chiudi</button></div>
-  </div>
-</div>
-
 <script>
-/* ---------------- Stato (salvato nel browser) ---------------- */
-const LS = {
-  get: (k) => localStorage.getItem(k),
-  set: (k, v) => localStorage.setItem(k, v),
-};
-if (LS.get('kairo_store_v') !== '3') {
-  ['kairo_dev_user','kairo_dev_mail','kairo_dev_code','kairo_dev_cert','kairo_dev_active'].forEach(k=>localStorage.removeItem(k));
-  LS.set('kairo_store_v','3');
-}
-const dev = {
-  get user()     { return LS.get('kairo_dev_user')   || ''; },
-  get mail()     { return LS.get('kairo_dev_mail')   || ''; },
-  get code()     { return LS.get('kairo_dev_code')   || ''; },
-  get cert()     { return LS.get('kairo_dev_cert')   === '1'; },
-  get active()   { return LS.get('kairo_dev_active') === '1'; },
-};
+/* ---------------- Config Supabase ---------------- */
+const SUPABASE_URL = 'https://skswsufsnxebebahnhtc.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrc3dzdWZzbnhlYmViYWhuaHRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1NTk4OTUsImV4cCI6MjEwMTEzNTg5NX0.G-zlyvK-Y8bzjMX6qCH_SUH_nOUPQh8HcPv2Eve--Cc';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+let PROFILE = null;
+let SESSION = null;
+/* ---------------- Autenticazione e profilo (account reali) ---------------- */
 function genCode(){ return Math.random().toString(36).slice(2,6).toUpperCase() + Math.floor(10+Math.random()*89); }
 function hashSig(str){ let h = 5381; for (let i = 0; i < str.length; i++){ h = ((h << 5) + h + str.charCodeAt(i)) | 0; } return (h >>> 0).toString(16).toUpperCase().padStart(8, '0'); }
 
+async function refreshSession(){
+  const { data } = await sb.auth.getSession();
+  SESSION = data.session;
+  return SESSION;
+}
+async function refreshProfile(){
+  if(!SESSION){ PROFILE = null; return PROFILE; }
+  const { data } = await sb.from('profiles').select('*').eq('id', SESSION.user.id).maybeSingle();
+  PROFILE = data || null;
+  return PROFILE;
+}
+
 function certText(){
   const body =
-    'Name: ' + dev.user + '\n' +
-    'Email: ' + dev.mail + '\n' +
-    'Code: ' + dev.code + '\n' +
+    'Name: ' + PROFILE.username + '\n' +
+    'Email: ' + SESSION.user.email + '\n' +
+    'Code: ' + PROFILE.cert_code + '\n' +
     'Issued: ' + new Date().toISOString().slice(0,10) + '\n' +
-    'Signature: ' + hashSig(dev.user + '|' + dev.mail + '|' + dev.code);
+    'Signature: ' + hashSig(PROFILE.username + '|' + SESSION.user.email + '|' + PROFILE.cert_code);
   return '-----BEGIN KAIRO DEVELOPER CERTIFICATE-----\n' + body + '\n-----END KAIRO DEVELOPER CERTIFICATE-----';
 }
 function verifyCert(text){
@@ -484,8 +459,8 @@ function verifyCert(text){
   if (!m) return { ok:false, why:'Non sembra un certificato Kairo.' };
   const get = (k) => { const r = new RegExp('^' + k + ':\\s*(.+)$', 'm').exec(m[1]); return r ? r[1].trim() : ''; };
   const name = get('Name'), mail = get('Email'), code = get('Code'), sig = get('Signature');
-  if (mail !== dev.mail) return { ok:false, why:'Questo certificato appartiene a un\'altra email.' };
-  if (code !== dev.code) return { ok:false, why:'Il codice nel certificato non è valido.' };
+  if (mail !== SESSION.user.email) return { ok:false, why:'Questo certificato appartiene a un\'altra email.' };
+  if (code !== PROFILE.cert_code) return { ok:false, why:'Il codice nel certificato non è valido.' };
   if (sig !== hashSig(name + '|' + mail + '|' + code)) return { ok:false, why:'La firma del certificato non è autentica.' };
   return { ok:true };
 }
@@ -554,7 +529,9 @@ const ICONS = ['airplane','alarm','app','arrow-right','back','battery','bell','b
 'volume','wallet','warning','wifi','world'];
 
 /* ---------------- Navigazione ---------------- */
+let currentPage = 'store';
 function showPage(p){
+  currentPage = p;
   document.getElementById('pageStore').classList.toggle('hidden', p!=='store');
   document.getElementById('pageSdk').classList.toggle('hidden', p!=='sdk');
   document.getElementById('pageDev').classList.toggle('hidden', p!=='dev');
@@ -567,30 +544,41 @@ document.getElementById('navStore').onclick = ()=>{ showPage('store'); loadStore
 document.getElementById('navSdk').onclick   = ()=>showPage('sdk');
 document.getElementById('navDev').onclick   = ()=>showPage('dev');
 
-/* ---------------- Flusso developer ---------------- */
-function renderDevState(){
-  if(dev.active){ showDevSdk(); return; }
-  if(dev.user && dev.code){ showActivate(); return; }
-  if(dev.user){ showCert(); return; }
-  showHome();
+/* ---------------- Flusso developer (account reali) ---------------- */
+async function renderDevState(){
+  await refreshSession();
+  if(!SESSION){ setSections(); show('devHome'); updateChip(false); return; }
+  await refreshProfile();
+  if(!PROFILE){ setSections(); show('devHome'); updateChip(false); return; }
+  updateChip(true);
+  if(PROFILE.certified){ showDevSdk(); return; }
+  if(PROFILE.cert_code){ showActivate(); return; }
+  showCert();
 }
-function setSections(){ for(const id of ['devHome','devCert','devActivate','devSdk','devPortal']) hide(id); }
+function setSections(){ for(const id of ['devHome','devConfirm','devCert','devActivate','devSdk','devPortal']) hide(id); }
 function showHome(){ setSections(); show('devHome'); }
+function showConfirm(){
+  setSections();
+  document.getElementById('confirmMail').textContent = SESSION ? SESSION.user.email : '';
+  show('devConfirm');
+}
 function showCert(){
   setSections();
-  document.getElementById('certMail').textContent = dev.mail;
+  if(!PROFILE) return;
+  document.getElementById('certUser').textContent = PROFILE.username;
+  document.getElementById('certCodeShown').textContent = PROFILE.cert_code || '';
+  document.getElementById('certResult').classList.toggle('hidden', !PROFILE.cert_code);
   show('devCert');
 }
 function showActivate(){
   setSections();
   document.getElementById('certInput').value = '';
   hide('certErr'); hide('codeErr'); hide('certOk');
-  if(dev.cert){ show('certOk'); }
   show('devActivate');
 }
 function showDevSdk(){
   setSections();
-  document.getElementById('sdkUser').textContent = dev.user;
+  document.getElementById('sdkUser').textContent = PROFILE ? PROFILE.username : '';
   updateChip(true);
   show('devSdk');
 }
@@ -601,32 +589,68 @@ function openPortal(){
   selectMenu('app');
 }
 
-/* Registrazione */
-document.getElementById('regForm').addEventListener('submit', (e)=>{
+/* Registrati / Accedi */
+let authTab = 'signup';
+function setAuthTab(t){
+  authTab = t;
+  document.getElementById('tabSignup').classList.toggle('on', t==='signup');
+  document.getElementById('tabLogin').classList.toggle('on', t==='login');
+  document.getElementById('userLabel').style.display = t==='signup' ? '' : 'none';
+  document.getElementById('regUser').style.display    = t==='signup' ? '' : 'none';
+  document.getElementById('regSubmit').innerHTML = t==='signup'
+    ? '<span class="mi">arrow_forward</span>Crea account'
+    : '<span class="mi">login</span>Accedi';
+}
+async function doAuth(e){
   e.preventDefault();
   const u = document.getElementById('regUser').value.trim();
   const m = document.getElementById('regMail').value.trim();
-  LS.set('kairo_dev_user', u);
-  LS.set('kairo_dev_mail', m);
-  LS.set('kairo_dev_code', genCode());
-  LS.set('kairo_dev_cert','0');
-  LS.set('kairo_dev_active','0');
-  showCert();
-});
-
-/* Email certificazione */
-function openCertMail(){
-  document.getElementById('certMailTo').textContent   = dev.mail;
-  document.getElementById('certMailUser').textContent = dev.user;
-  document.getElementById('certMailCode').textContent = dev.code;
-  show('certMailOverlay');
+  const p = document.getElementById('regPass').value;
+  const err = document.getElementById('authErr');
+  const btn = document.getElementById('regSubmit');
+  hide('authErr');
+  btn.disabled = true;
+  try{
+    if(authTab === 'signup'){
+      const { error } = await sb.auth.signUp({ email:m, password:p, options:{ data:{ username:u } } });
+      if(error) throw error;
+      await refreshSession();
+      if(SESSION){
+        await refreshProfile();
+        updateChip(true);
+        if(PROFILE && PROFILE.cert_code){ showActivate(); } else { showCert(); }
+      }else{
+        showConfirm();
+      }
+    }else{
+      const { error } = await sb.auth.signInWithPassword({ email:m, password:p });
+      if(error) throw error;
+      renderDevState();
+    }
+  }catch(ex){
+    err.textContent = ex.message || 'Errore. Riprova.';
+    show('authErr');
+  }finally{
+    btn.disabled = false;
+  }
 }
-function closeCertMail(){ hide('certMailOverlay'); }
+document.getElementById('regForm').addEventListener('submit', doAuth);
+
+/* Certificazione (dati reali nel database) */
+async function requestCert(){
+  if(PROFILE && PROFILE.cert_code){ showActivate(); return; }
+  const code = genCode();
+  const { error } = await sb.from('profiles').update({ cert_code: code }).eq('id', SESSION.user.id);
+  if(error){ toast('Errore: ' + error.message); return; }
+  PROFILE.cert_code = code;
+  showCert();
+  toast('Certificazione richiesta');
+}
 function downloadCert(){
   const blob = new Blob([certText()], { type:'application/octet-stream' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'kairo-certificate-' + dev.user + '.cert';
+  a.download = 'kairo-certificate-' + PROFILE.username + '.cert';
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -642,10 +666,8 @@ document.getElementById('certFile').addEventListener('change', (ev)=>{
     const res = verifyCert(String(reader.result));
     const err = document.getElementById('certErr');
     if(res.ok){
-      LS.set('kairo_dev_cert','1');
       hide('certErr'); show('certOk');
     }else{
-      LS.set('kairo_dev_cert','0');
       hide('certOk'); err.textContent = res.why; show('certErr');
     }
   };
@@ -654,31 +676,41 @@ document.getElementById('certFile').addEventListener('change', (ev)=>{
 
 /* Impostazioni / attivazione */
 function gotoSettings(){ showActivate(); }
-function activateCert(){
+async function activateCert(){
   const v = document.getElementById('certInput').value.trim().toUpperCase();
   const codeErr = document.getElementById('codeErr');
-  if(!dev.cert){
-    codeErr.textContent = 'Prima carica il certificato ricevuto via email.';
+  if(!PROFILE.cert_code){
+    codeErr.textContent = 'Prima richiedi la certificazione.';
     show('codeErr');
     return;
   }
-  if(v === dev.code){
-    LS.set('kairo_dev_active','1');
+  if(v === PROFILE.cert_code){
+    const { error } = await sb.from('profiles').update({ certified: true }).eq('id', SESSION.user.id);
+    if(error){ codeErr.textContent = error.message; show('codeErr'); return; }
+    PROFILE.certified = true;
     hide('codeErr');
     showDevSdk();
   }else{
-    codeErr.textContent = 'Codice errato. Rileggi l\'email e riprova.';
+    codeErr.textContent = 'Codice errato. Rivedi il tuo codice.';
     show('codeErr');
   }
 }
 
-/* Email SDK con allegato */
-function openSdkMail(){
-  document.getElementById('sdkMailTo').textContent   = dev.mail;
-  document.getElementById('sdkMailUser').textContent = dev.user;
-  show('sdkMailOverlay');
+/* Logout */
+function logout(){
+  sb.auth.signOut().then(()=>{
+    PROFILE = null; SESSION = null;
+    updateChip(false);
+    setSections();
+    show('devHome');
+  });
 }
-function closeSdkMail(){ hide('sdkMailOverlay'); }
+
+sb.auth.onAuthStateChange((event) => {
+  if(currentPage === 'dev' && ['SIGNED_IN','SIGNED_OUT','USER_UPDATED','TOKEN_REFRESHED'].includes(event)){
+    renderDevState();
+  }
+});
 
 /* Portal sidebar + pannelli */
 function buildSidebar(){
@@ -808,7 +840,8 @@ async function loadMyApps(){
     const res = await fetch(CATALOG_URL, {cache:'no-cache'});
     if(!res.ok) throw 0;
     const data = await res.json();
-    const mine = (data.apps || []).filter(a => a.author && a.author.toLowerCase() === dev.user.toLowerCase());
+    const myName = PROFILE ? PROFILE.username.toLowerCase() : '';
+    const mine = myName ? (data.apps || []).filter(a => a.author && a.author.toLowerCase() === myName) : [];
     if(!mine.length){
       area.innerHTML = '<h2><span class="mi">apps</span>Le tue app</h2>' +
         '<div class="sub">Le app che hai pubblicato su Kairo Store.</div>' +
@@ -836,7 +869,8 @@ async function loadReviewApps(){
     const res = await fetch(PENDING_URL, {cache:'no-cache'});
     if(!res.ok) throw 0;
     const data = await res.json();
-    const mine = (data.apps || []).filter(a => a.author && a.author.toLowerCase() === dev.user.toLowerCase());
+    const myName = PROFILE ? PROFILE.username.toLowerCase() : '';
+    const mine = myName ? (data.apps || []).filter(a => a.author && a.author.toLowerCase() === myName) : [];
     if(!mine.length){
       area.innerHTML = '<h2><span class="mi">schedule</span>App in revisione</h2>' +
         '<div class="sub">Queste app stanno ancora passando la revisione.</div>' +
@@ -861,7 +895,7 @@ function buildManifest(){
   const ver = document.getElementById('pubVer').value.trim() || '1.0.0';
   const file = document.getElementById('pubFile').value.trim();
   const icon = document.getElementById('pubIcon').value.trim() || 'icon.png';
-  const manifest = { id, name, author: dev.user || '', version: ver, desc, icon, file, status:'pending', date: new Date().toISOString().slice(0,10) };
+  const manifest = { id, name, author: PROFILE ? PROFILE.username : '', version: ver, desc, icon, file, status:'pending', date: new Date().toISOString().slice(0,10) };
   const blob = new Blob([JSON.stringify(manifest, null, 2)], { type:'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -879,7 +913,8 @@ function show(id){ document.getElementById(id).classList.remove('hidden'); }
 function hide(id){ document.getElementById(id).classList.add('hidden'); }
 function updateChip(visible){
   document.getElementById('userChip').classList.toggle('hidden', !visible);
-  if(visible) document.getElementById('userName').textContent = dev.user;
+  document.getElementById('btnLogout').classList.toggle('hidden', !visible);
+  if(visible) document.getElementById('userName').textContent = (PROFILE && PROFILE.username) || (SESSION && SESSION.user.email) || '—';
 }
 function toast(msg){
   const t = document.createElement('div');
@@ -892,7 +927,7 @@ function toast(msg){
 }
 
 /* ---------------- Avvio ---------------- */
-updateChip(dev.user && dev.active);
+updateChip(false);
 loadStore();
 </script>
 </body>
