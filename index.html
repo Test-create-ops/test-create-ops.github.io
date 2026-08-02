@@ -401,6 +401,21 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
         <a class="btn" href="KairoSDK-v0.1.0.zip" download><span class="mi">download</span>Scarica</a>
       </div>
     </div>
+    <div class="card" style="margin:18px 0; border-color:var(--accent);">
+      <h2><span class="mi">code</span>KairoCode — l'IDE di Kairo</h2>
+      <p style="color:var(--muted); line-height:1.7;">L'IDE che scarica e installa il KairoSDK da solo, crea il progetto con tutti i file già pronti, compila, esegue e prepara la pubblicazione.</p>
+      <div class="attach">
+        <div class="afile"><span class="mi">download</span></div>
+        <div style="flex:1;">
+          <b>KairoCode-v1.0.0.zip</b><br>
+          <span style="font-size:12px; color:var(--muted);">1 MB · app macOS</span>
+        </div>
+        <a class="btn" href="KairoCode-v1.0.0.zip" download><span class="mi">download</span>Scarica</a>
+      </div>
+      <p style="font-size:12.5px; color:var(--muted); line-height:1.8; margin-top:10px;">
+        Prima apertura su macOS: tasto destro sull'app → <b style="color:var(--text)">Apri</b> → <b style="color:var(--text)">Apri comunque</b> (oppure da terminale: <span style="font-family:monospace; background:var(--surface); padding:1px 6px; border-radius:5px;">xattr -dr com.apple.quarantine ~/Downloads/KairoCode.app</span>).
+      </p>
+    </div>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn big" onclick="openPortal()"><span class="mi">power_settings_new</span>Apri il Developer Portal</button>
     </div>
@@ -773,8 +788,8 @@ function selectMenu(id){
       <div class="card" style="margin-bottom:18px; border-color:var(--accent);">
         <h2><span class="mi">code</span>Prima di pubblicare</h2>
         <p style="color:var(--muted); font-size:13.5px; line-height:1.9;">
-          Le app devono essere sviluppate in <b style="color:var(--text)">C</b> dentro <b style="color:var(--text)">VS Code</b>.
-          Se preferisci avere già tutto preparato, <b style="color:var(--text)">KairoCode</b>, l'IDE di Kairo, è perfetto.
+          Le app devono essere sviluppate in <b style="color:var(--text)">C</b> dentro <b style="color:var(--text)">KairoCode</b>, l'IDE di Kairo.
+          Scaricalo dalla sezione developer: ti dà tutto già pronto, compila, esegue e prepara la pubblicazione.
         </p>
       </div>
       <form id="pubForm" onsubmit="return buildManifest()">
@@ -812,10 +827,10 @@ function selectMenu(id){
       <div class="card">
         <h2><span class="mi">code</span>Linguaggio e strumenti</h2>
         <p style="color:var(--muted); font-size:13.5px; line-height:1.9;">
-          Le app di Kairo Store devono essere sviluppate in <b style="color:var(--text)">C</b>,
-          con l'editor <b style="color:var(--text)">VS Code</b>, usando il <b style="color:var(--text)">KairoSDK</b>.<br>
-          Se vuoi trovare già tutto preparato, <b style="color:var(--text)">KairoCode</b> è l'IDE perfetto:
-          ti dà l'ambiente completo per scrivere, compilare e testare subito, senza configurare nulla.
+          Le app di Kairo Store si sviluppano in <b style="color:var(--text)">C</b> con <b style="color:var(--text)">KairoCode</b>, l'IDE di Kairo,
+          usando il <b style="color:var(--text)">KairoSDK</b>.<br>
+          KairoCode scarica e installa il KairoSDK da solo, crea il progetto con i file già pronti,
+          compila ed esegue e prepara la pubblicazione sullo store.
         </p>
       </div>
       <div class="card">
@@ -824,7 +839,7 @@ function selectMenu(id){
           1. Registrati e conferma l'email reale.<br>
           2. Richiedi la certificazione: il codice personale arriva via email.<br>
           3. Attivala inserendo il codice (e caricando il certificato).<br>
-          4. Scarica il KairoSDK e inizia a creare.
+          4. Scarica KairoCode + il KairoSDK e inizia a creare.
         </p>
       </div>
       <div class="card">
