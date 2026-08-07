@@ -209,6 +209,7 @@
     <button id="navStore" class="on"><span class="mi">apps</span>Store</button>
     <button id="navSdk"><span class="mi">code</span>SDK</button>
     <button id="navDev"><span class="mi">person</span>Developers</button>
+    <button id="navContact"><span class="mi">mail</span>Contatti</button>
   </nav>
   <div class="spacer"></div>
   <div class="userchip hidden" id="userChip"><span class="dot"></span><span id="userName">—</span></div>
@@ -435,6 +436,44 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
   </section>
 </main>
 
+<!-- ================= CONTATTI ================= -->
+<main id="pageContact" class="wrap hidden">
+  <div class="hero">
+    <span class="badge"><span class="mi">support_agent</span>Kairo Support Emailer</span>
+    <h1>Contattaci — <b>Kairo Support</b></h1>
+    <p>Domande su KairoOS, su Kairo Store, sull'SDK o su WindiroOS? Compila il modulo qui sotto:
+       si apre il tuo client di posta con l'email già pronta. Niente form nascosti, niente attese.</p>
+  </div>
+
+  <div class="grid">
+    <div class="feature"><span class="mi">mail</span><h3>Email</h3><p><a href="mailto:teodorgrigore15@gmail.com">teodorgrigore15@gmail.com</a></p></div>
+    <div class="feature"><span class="mi">code</span><h3>GitHub</h3><p><a href="https://github.com/Test-create-ops/KairoOS-BETA" target="_blank" rel="noopener">KairoOS-BETA</a></p></div>
+    <div class="feature"><span class="mi">forum</span><h3>Discord</h3><p style="color:var(--faint);">in arrivo</p></div>
+  </div>
+
+  <div class="card" style="max-width:640px;">
+    <h2><span class="mi">mail</span>Kairo Support Emailer</h2>
+    <p style="color:var(--muted); font-size:13.5px; line-height:1.8; margin-bottom:6px;">
+      L'email arriva a <b style="color:var(--text)">teodorgrigore15@gmail.com</b>.
+      Rispondiamo entro qualche giorno lavorativo.</p>
+    <form id="contactForm" onsubmit="return sendContact()">
+      <label>Il tuo nome</label>
+      <input type="text" id="ctName" placeholder="es. Kairo Kid" required>
+      <label>La tua email (per la risposta)</label>
+      <input type="email" id="ctMail" placeholder="es. tu@email.com" required>
+      <label>Oggetto</label>
+      <input type="text" id="ctSubject" placeholder="es. Domanda su KairoOS" required>
+      <label>Messaggio</label>
+      <textarea id="ctMsg" rows="6" placeholder="Scrivi qui il tuo messaggio..." required
+        style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--border);
+               background:var(--bg); color:var(--text); font-size:14px; font-family:inherit; resize:vertical;"></textarea>
+      <div style="margin-top:20px;">
+        <button class="btn big" type="submit"><span class="mi">mail</span>Invia email</button>
+      </div>
+    </form>
+  </div>
+</main>
+
 <script>
 /* ---------------- Config Supabase ---------------- */
 const SUPABASE_URL = 'https://skswsufsnxebebahnhtc.supabase.co';
@@ -572,14 +611,29 @@ function showPage(p){
   document.getElementById('pageStore').classList.toggle('hidden', p!=='store');
   document.getElementById('pageSdk').classList.toggle('hidden', p!=='sdk');
   document.getElementById('pageDev').classList.toggle('hidden', p!=='dev');
+  document.getElementById('pageContact').classList.toggle('hidden', p!=='contact');
   document.getElementById('navStore').classList.toggle('on', p==='store');
   document.getElementById('navSdk').classList.toggle('on', p==='sdk');
   document.getElementById('navDev').classList.toggle('on', p==='dev');
+  document.getElementById('navContact').classList.toggle('on', p==='contact');
   if(p==='dev') renderDevState();
 }
 document.getElementById('navStore').onclick = ()=>{ showPage('store'); loadStore(); };
 document.getElementById('navSdk').onclick   = ()=>showPage('sdk');
 document.getElementById('navDev').onclick   = ()=>showPage('dev');
+document.getElementById('navContact').onclick = ()=>showPage('contact');
+
+/* ---------------- Contatti (Kairo Support Emailer) ---------------- */
+function sendContact(){
+  const name = document.getElementById('ctName').value.trim();
+  const mail = document.getElementById('ctMail').value.trim();
+  const subj = document.getElementById('ctSubject').value.trim();
+  const msg  = document.getElementById('ctMsg').value.trim();
+  const body = 'Da: ' + name + ' (' + mail + ')\n\n' + msg;
+  window.location.href = 'mailto:teodorgrigore15@gmail.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+  toast('Apertura client email...');
+  return false;
+}
 
 /* ---------------- Flusso developer (account reali) ---------------- */
 function showDevErr(msg){
