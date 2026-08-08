@@ -442,7 +442,7 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
     <span class="badge"><span class="mi">support_agent</span>Kairo Support</span>
     <h1>Contattaci — <b>Kairo Support</b></h1>
     <p>Domande su KairoOS, su Kairo Store, sull'SDK o su WindiroOS? Compila il modulo qui sotto:
-       si apre il tuo client di posta con l'email già pronta. Niente form nascosti, niente attese.</p>
+       l'email arriva direttamente al supporto, senza passare dal tuo client di posta.</p>
   </div>
 
   <div class="grid">
@@ -454,9 +454,11 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
   <div class="card" style="max-width:640px;">
     <h2><span class="mi">mail</span>Kairo Support</h2>
     <p style="color:var(--muted); font-size:13.5px; line-height:1.8; margin-bottom:6px;">
-      L'email arriva a <b style="color:var(--text)">teodorgrigore15@gmail.com</b>.
-      Rispondiamo entro qualche giorno lavorativo.</p>
+      Premi <b style="color:var(--text)">Invia</b>: il messaggio parte subito verso
+      <b style="color:var(--text)">teodorgrigore15@gmail.com</b>. Rispondiamo entro qualche giorno lavorativo.</p>
     <form id="contactForm" onsubmit="return sendContact()">
+      <input type="text" id="ctHp" value="" tabindex="-1" autocomplete="off" aria-hidden="true"
+        style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;">
       <label>Il tuo nome</label>
       <input type="text" id="ctName" placeholder="es. Kairo Kid" required>
       <label>La tua email (per la risposta)</label>
@@ -468,7 +470,7 @@ c.save(<span class="lit">"cuore.bmp"</span>);</code></pre>
         style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--border);
                background:var(--bg); color:var(--text); font-size:14px; font-family:inherit; resize:vertical;"></textarea>
       <div style="margin-top:20px;">
-        <button class="btn big" type="submit"><span class="mi">mail</span>Invia email</button>
+        <button class="btn big" type="submit"><span class="mi">send</span>Invia a Kairo Support</button>
       </div>
     </form>
   </div>
@@ -623,15 +625,34 @@ document.getElementById('navSdk').onclick   = ()=>showPage('sdk');
 document.getElementById('navDev').onclick   = ()=>showPage('dev');
 document.getElementById('navContact').onclick = ()=>showPage('contact');
 
-/* ---------------- Contatti (Kairo Support Emailer) ---------------- */
-function sendContact(){
+/* ---------------- Contatti (Kairo Support, invio via send-mail) ---------------- */
+async function sendContact(){
   const name = document.getElementById('ctName').value.trim();
   const mail = document.getElementById('ctMail').value.trim();
   const subj = document.getElementById('ctSubject').value.trim();
   const msg  = document.getElementById('ctMsg').value.trim();
-  const body = 'Da: ' + name + ' (' + mail + ')\n\n' + msg;
-  window.location.href = 'mailto:teodorgrigore15@gmail.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
-  toast('Apertura client email...');
+  const hp   = document.getElementById('ctHp') ? document.getElementById('ctHp').value : '';
+  if(!name || !mail || !msg){ toast('Compila tutti i campi.'); return false; }
+  const btn = document.querySelector('#contactForm button[type=submit]');
+  btn.disabled = true;
+  try{
+    const r = await fetch(EDGE, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain' },
+      body: JSON.stringify({ type:'contact', name, mail, subject:subj, message:msg, hp })
+    });
+    const d = await r.json().catch(()=>({}));
+    if(r.ok && d.ok){
+      toast('Inviato a Kairo Support! Ti rispondiamo presto.');
+      document.getElementById('contactForm').reset();
+    }else{
+      toast('Errore: ' + (d.error || 'riprova tra poco'));
+    }
+  }catch(ex){
+    toast('Errore: ' + ex.message);
+  }finally{
+    btn.disabled = false;
+  }
   return false;
 }
 
