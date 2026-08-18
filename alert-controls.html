@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alert Controls — Kairo</title>
+<link rel="icon" href="icons/kairo_logo.png">
+<style>
+  @font-face{font-family:'Material Icons';font-style:normal;font-weight:400;src:url('fonts/material-icons.woff2') format('woff2');}
+  :root{
+    --bg:#1e1e2e;--surface:#28283a;--text:#cdd6f4;--accent:#89b4fa;
+    --border:#45475a;--button:#313244;--button-hover:#45475a;
+    --error:#f38ba8;--ok:#a6e3a1;--warn:#f9e2af;--muted:#a6adc8;--red:#cd0000;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;}
+  a{color:var(--accent);text-decoration:none;}
+
+  .mi{font-family:'Material Icons';font-weight:normal;font-style:normal;font-size:20px;display:inline-block;line-height:1;white-space:nowrap;word-wrap:normal;direction:ltr;user-select:none;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;vertical-align:middle;}
+
+  header{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:20px;padding:12px 28px;background:rgba(30,30,46,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+  .brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:800;letter-spacing:.3px;}
+  .brand b{color:var(--accent);}
+  .brand img{width:26px;height:26px;}
+
+  .wrap{max-width:720px;margin:0 auto;padding:32px 28px 60px;}
+
+  .hero{position:relative;overflow:hidden;background:linear-gradient(160deg,#34354a 0%,#232338 60%,#1e1e2e 100%);border:1px solid var(--border);border-radius:20px;padding:44px 40px;margin-bottom:30px;}
+  .hero::before{content:"";position:absolute;top:-120px;right:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(137,180,250,.16),transparent 65%);pointer-events:none;}
+  .hero h1{font-size:31px;line-height:1.25;margin-bottom:12px;}
+  .hero h1 b{color:var(--accent);}
+  .hero p{color:var(--muted);line-height:1.7;max-width:640px;font-size:15px;}
+  .badge{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;background:rgba(137,180,250,.14);color:var(--accent);border:1px solid rgba(137,180,250,.35);font-weight:700;padding:7px 16px;border-radius:999px;font-size:12px;letter-spacing:.4px;text-transform:uppercase;}
+  .badge .mi{font-size:15px;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;margin-bottom:20px;}
+  .card h2{margin-bottom:14px;font-size:19px;display:flex;align-items:center;gap:10px;}
+  .card h2 .mi{font-size:22px;color:var(--accent);}
+
+  label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px;font-weight:600;}
+  input[type=text],input[type=password],textarea{
+    width:100%;padding:12px 14px;border-radius:11px;border:1px solid var(--border);
+    background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;transition:border-color .15s;resize:vertical;}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(137,180,250,.15);}
+
+  .btn{display:inline-flex;align-items:center;gap:9px;background:var(--accent);color:#11111b;border:none;padding:12px 22px;border-radius:11px;font-size:14px;font-weight:700;transition:filter .15s;cursor:pointer;font-family:inherit;}
+  .btn:hover{filter:brightness(1.12);}
+  .btn .mi{font-size:19px;}
+  .btn.ghost{background:var(--button);color:var(--text);border:1px solid var(--border);}
+  .btn.ghost:hover{background:var(--button-hover);filter:none;}
+  .btn.big{font-size:15px;padding:14px 28px;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .btn.red{background:var(--red);color:#fff;}
+  .btn.red:hover{background:#e60000;}
+  .btn.ok{background:var(--ok);color:#11111b;}
+
+  .toggle-row{display:flex;align-items:center;gap:14px;margin:16px 0;}
+  .toggle{position:relative;width:48px;height:26px;cursor:pointer;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .toggle .slider{position:absolute;inset:0;background:var(--button);border:1px solid var(--border);border-radius:13px;transition:background .2s;}
+  .toggle .slider::before{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;background:var(--muted);border-radius:50%;transition:transform .2s,background .2s;}
+  .toggle input:checked+.slider{background:var(--red);border-color:var(--red);}
+  .toggle input:checked+.slider::before{transform:translateX(22px);background:#fff;}
+  .toggle-label{font-size:14px;color:var(--text);}
+
+  .status-bar{display:flex;align-items:center;gap:12px;padding:16px 20px;border-radius:13px;margin:18px 0;font-weight:600;font-size:14px;}
+  .status-bar.active{background:rgba(205,0,0,.12);border:1px solid var(--red);color:var(--red);}
+  .status-bar.inactive{background:rgba(166,227,161,.1);border:1px solid var(--ok);color:var(--ok);}
+  .status-bar .mi{font-size:22px;}
+
+  .errbar{color:var(--error);font-size:13px;margin-top:10px;}
+  .infobar{color:var(--ok);font-size:13px;margin-top:10px;}
+
+  /* PIN overlay */
+  .pin-overlay{position:fixed;inset:0;background:rgba(17,17,27,.92);display:flex;align-items:center;justify-content:center;z-index:200;}
+  .pin-overlay .pin-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;max-width:400px;width:90%;}
+  .pin-overlay h2{font-size:22px;margin-bottom:8px;}
+  .pin-overlay p{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.6;}
+  .pin-overlay input{width:100%;text-align:center;font-size:24px;letter-spacing:12px;padding:14px;font-family:ui-monospace,Menlo,monospace;}
+
+  .lockout-bar{margin-top:14px;padding:10px 16px;border-radius:8px;background:rgba(243,139,168,.1);border:1px solid var(--error);color:var(--error);font-size:13px;font-weight:600;}
+
+  .hidden{display:none !important;}
+
+  footer{text-align:center;color:#585b70;font-size:12px;padding:34px;}
+</style>
+</head>
+<body>
+
+<!-- PIN Overlay -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-box">
+    <h2><span class="mi" style="font-size:28px;color:var(--red);">lock</span></h2>
+    <h2 id="pinTitle">Accesso Riservato</h2>
+    <p id="pinDesc">Inserisci il PIN per accedere al pannello di controllo delle allerte.</p>
+    <input type="password" id="pinInput" placeholder="••••••••" maxlength="32" autocomplete="off">
+    <div class="errbar hidden" id="pinErr"></div>
+    <div class="infobar hidden" id="pinOk"></div>
+    <div class="lockout-bar hidden" id="lockoutBar" style="display:none;"></div>
+    <div style="margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn big" id="pinBtn" onclick="handlePinAction()"><span class="mi">login</span><span id="pinBtnLabel">Accedi</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Controls -->
+<div id="mainControls" class="hidden">
+  <header>
+    <div class="brand"><img src="icons/kairo_logo.png" alt="Kairo">Kairo<b>Alert</b></div>
+  </header>
+
+  <div class="wrap">
+    <div class="hero">
+      <span class="badge"><span class="mi">warning</span>Controllo Allerta</span>
+      <h1>Pannello <b>Controllo Allerta</b></h1>
+      <p>Gestisci il sistema di allerta di emergenza. Da qui puoi attivare, disattivare e configurare gli alert.
+         L'allerta apparirà su <b style="color:var(--accent)">alert.html</b> in tempo reale.</p>
+    </div>
+
+    <div class="status-bar inactive" id="statusBar">
+      <span class="mi">check_circle</span>
+      <span id="statusText">Nessun allerta attiva</span>
+    </div>
+
+    <!-- Sync Status -->
+    <div class="card" id="syncCard">
+      <h2><span class="mi">cloud_sync</span>Sincronizzazione Globale</h2>
+      <div id="syncSetup">
+        <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Collega un <b>GitHub Personal Access Token</b> per rendere le allerte visibili a <b>tutti</b> i visitatori del sito.</p>
+        <label>GitHub Token (repo scope)</label>
+        <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn" onclick="saveGitHubToken()"><span class="mi">save</span>Salva Token</button>
+          <button class="btn ghost" onclick="testGitHubToken()"><span class="mi">wifi_tethering</span>Test Connessione</button>
+        </div>
+        <div id="syncMsg" style="margin-top:10px;font-size:13px;"></div>
+      </div>
+      <div id="syncActive" class="hidden">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="mi" style="color:var(--ok);font-size:20px;">cloud_done</span>
+          <span style="font-size:14px;">Sincronizzazione <b style="color:var(--ok)">attiva</b> — le allerte sono visibili a tutti i visitatori</span>
+        </div>
+        <div style="margin-top:10px;">
+          <button class="btn ghost" onclick="removeGitHubToken()" style="font-size:12px;padding:8px 14px;"><span class="mi" style="font-size:16px;">link_off</span>Disconnetti</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="mi">tune</span>Tipo di Allerta</h2>
+      <div class="toggle-row">
+        <label class="toggle">
+          <input type="checkbox" id="isTest">
+          <span class="slider"></span>
+        </label>
+        <span class="toggle-label" id="testLabel">Allerta <b>REALE</b></span>
+      </div>
+      <p style="color:var(--muted);font-size:13px;">Quando il toggle è attivo, viene mostrato un badge "TEST" sulla pagina allerta.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="mi">edit</span>Contenuto Allerta</h2>
+      <label>Chi trasmette (testo top bar)</label>
+      <input type="text" id="transmitter" placeholder="es. Sistema Nazionale di Allerta" value="SISTEMA DI ALLERTA">
+      <label>Tipo di messaggio</label>
+      <input type="text" id="msgType" placeholder="es. MESSAGGIO DI EMERGENZA" value="MESSAGGIO DI EMERGENZA">
+      <label>Tipo di attacco / titolo allerta</label>
+      <input type="text" id="alertTitle" placeholder="es. ALLERTA CYBERATTACCO" value="ALLERTA CYBERATTACCO">
+      <label>Messaggio (corpo dell'allerta)</label>
+      <textarea id="alertMessage" rows="5" placeholder="Descrivi l'attacco...">Questo è il messaggio dell'allerta. Leggere attentamente le informazioni e seguire le indicazioni fornite.</textarea>
+    </div>
+
+    <div class="card">
+      <h2><span class="mi">record_voice_over</span>Annuncio Vocale (TTS)</h2>
+      <label>Testo dell'annuncio vocale (appare lettera per lettera)</label>
+      <textarea id="voiceText" rows="3" placeholder="es. Attenzione: è in corso un attacco...">Attenzione, attenzione: questo non è un esercitazione.</textarea>
+      <p style="color:var(--muted);font-size:12px;margin-top:8px;">Il TTS parte 3 secondi dopo l'attivazione dell'allerta.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="mi">power_settings_new</span>Azioni</h2>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+        <button class="btn big red" onclick="activateAlert()"><span class="mi">warning</span>Attiva Allerta</button>
+        <button class="btn big ghost" onclick="deactivateAlert()"><span class="mi">power_off</span>Disattiva</button>
+        <button class="btn big ghost" onclick="openAlert()"><span class="mi">open_in_new</span>Apri alert.html</button>
+        <button class="btn big ghost" onclick="startChangePin()"><span class="mi">lock</span>Cambia PIN</button>
+        <button class="btn big ghost" onclick="resetAll()"><span class="mi">delete_forever</span>Reset Completo</button>
+      </div>
+      <div id="actionMsg" style="margin-top:14px;"></div>
+    </div>
+
+    <footer>Kairo Alert Controls — Accesso riservato</footer>
+  </div>
+</div>
+
+<script>
+// =============================================
+//  PIN — SHA-256, no lockout, cookie backup
+// =============================================
+const LS_KEY       = 'kairo_alert_state';
+const PIN_HASH_KEY = 'kairo_pin_hash';
+const PIN_SALT_KEY = 'kairo_pin_salt';
+const PIN_MIN_LEN  = 6;
+const COOKIE_DAYS  = 365;
+let currentMode = 'login';
+
+// ---------- Cookie helpers ----------
+function setCookie(name, val, days) {
+  const d = new Date();
+  d.setTime(d.getTime() + days * 86400000);
+  document.cookie = name + '=' + encodeURIComponent(val) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+}
+function getCookie(name) {
+  const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+  return v ? decodeURIComponent(v.pop()) : '';
+}
+function removeCookie(name) { setCookie(name, '', -1); }
+
+// ---------- Read/write with cookie backup ----------
+function savePinData(hash, salt) {
+  localStorage.setItem(PIN_HASH_KEY, hash);
+  localStorage.setItem(PIN_SALT_KEY, salt);
+  setCookie(PIN_HASH_KEY, hash, COOKIE_DAYS);
+  setCookie(PIN_SALT_KEY, salt, COOKIE_DAYS);
+}
+function readPinHash() { return localStorage.getItem(PIN_HASH_KEY) || getCookie(PIN_HASH_KEY); }
+function readPinSalt() { return localStorage.getItem(PIN_SALT_KEY) || getCookie(PIN_SALT_KEY); }
+function clearPinData() {
+  localStorage.removeItem(PIN_HASH_KEY);
+  localStorage.removeItem(PIN_SALT_KEY);
+  removeCookie(PIN_HASH_KEY);
+  removeCookie(PIN_SALT_KEY);
+}
+
+// ---------- SHA-256 ----------
+async function sha256(str) {
+  const data = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function generateSalt() {
+  const a = new Uint8Array(32);
+  crypto.getRandomValues(a);
+  return Array.from(a).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ---------- UI ----------
+function showErr(m) {
+  document.getElementById('pinErr').textContent = m;
+  document.getElementById('pinErr').classList.remove('hidden');
+  document.getElementById('pinOk').classList.add('hidden');
+}
+function showOk(m) {
+  document.getElementById('pinOk').textContent = m;
+  document.getElementById('pinOk').classList.remove('hidden');
+  document.getElementById('pinErr').classList.add('hidden');
+}
+function clearMsg() {
+  document.getElementById('pinErr').classList.add('hidden');
+  document.getElementById('pinOk').classList.add('hidden');
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  clearMsg();
+  const inp = document.getElementById('pinInput');
+  inp.value = '';
+  const modes = {
+    setup:      { t:'Imposta il tuo PIN', d:'Scegli un PIN. Minimo ' + PIN_MIN_LEN + ' caratteri.', b:'Imposta PIN', ph:'Scegli un PIN...' },
+    login:      { t:'Accesso Riservato',  d:'Inserisci il PIN per accedere al pannello.',           b:'Accedi',     ph:'••••••••' },
+    change_old: { t:'Cambia PIN',         d:'Inserisci il PIN attuale.',                            b:'Verifica',   ph:'PIN attuale...' },
+    change_new: { t:'Nuovo PIN',          d:'Nuovo PIN. Minimo ' + PIN_MIN_LEN + ' caratteri.',     b:'Salva PIN',  ph:'Nuovo PIN...' },
+  };
+  const m = modes[mode];
+  document.getElementById('pinTitle').textContent = m.t;
+  document.getElementById('pinDesc').textContent  = m.d;
+  document.getElementById('pinBtnLabel').textContent = m.b;
+  inp.placeholder = m.ph;
+  inp.focus();
+}
+
+// ---------- Core ----------
+async function handlePinAction() {
+  clearMsg();
+  const pin = document.getElementById('pinInput').value;
+  if (!pin) { showErr('Inserisci un PIN.'); return; }
+  try {
+    if (currentMode === 'setup')       await doSetup(pin);
+    else if (currentMode === 'login')      await doLogin(pin);
+    else if (currentMode === 'change_old') await doChangeOld(pin);
+    else if (currentMode === 'change_new') await doChangeNew(pin);
+  } catch(e) { showErr('Errore: ' + e.message); }
+}
+
+async function doSetup(pin) {
+  if (pin.length < PIN_MIN_LEN) { showErr('Minimo ' + PIN_MIN_LEN + ' caratteri.'); return; }
+  const salt = generateSalt();
+  const hash = await sha256(pin + salt);
+  savePinData(hash, salt);
+  showOk('PIN impostato!');
+  setTimeout(() => enterPanel(), 600);
+}
+
+async function doLogin(pin) {
+  const hash = readPinHash();
+  const salt = readPinSalt();
+  if (!hash || !salt) { setMode('setup'); return; }
+  if (await sha256(pin + salt) === hash) {
+    enterPanel();
+  } else {
+    showErr('PIN errato.');
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinInput').focus();
+  }
+}
+
+async function doChangeOld(pin) {
+  const hash = readPinHash();
+  const salt = readPinSalt();
+  if (await sha256(pin + salt) === hash) {
+    setMode('change_new');
+  } else {
+    showErr('PIN errato.');
+    document.getElementById('pinInput').value = '';
+  }
+}
+
+async function doChangeNew(pin) {
+  if (pin.length < PIN_MIN_LEN) { showErr('Minimo ' + PIN_MIN_LEN + ' caratteri.'); return; }
+  const salt = generateSalt();
+  const hash = await sha256(pin + salt);
+  savePinData(hash, salt);
+  showOk('PIN cambiato!');
+  setTimeout(() => setMode('login'), 700);
+}
+
+function enterPanel() {
+  document.getElementById('pinOverlay').classList.add('hidden');
+  document.getElementById('mainControls').classList.remove('hidden');
+  refreshStatus();
+}
+
+function startChangePin() {
+  setMode('change_old');
+  document.getElementById('pinOverlay').classList.remove('hidden');
+}
+
+function resetAll() {
+  if (!confirm('Reset completo? Rimuoverai il PIN e tutti i dati.')) return;
+  clearPinData();
+  localStorage.removeItem(LS_KEY);
+  location.reload();
+}
+
+// ---------- Events ----------
+document.getElementById('pinInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handlePinAction();
+});
+
+// ---------- Init ----------
+(function init() {
+  if (!readPinHash()) setMode('setup');
+  else setMode('login');
+})();
+
+// ---------- Alert Controls ----------
+function refreshStatus() {
+  try {
+    const d = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+    const bar = document.getElementById('statusBar');
+    const txt = document.getElementById('statusText');
+    if (d && d.active) {
+      bar.className = 'status-bar active';
+      bar.querySelector('.mi').textContent = 'warning';
+      txt.textContent = 'Allerta attiva: ' + (d.title || 'Senza titolo');
+    } else {
+      bar.className = 'status-bar inactive';
+      bar.querySelector('.mi').textContent = 'check_circle';
+      txt.textContent = 'Nessun allerta attiva';
+    }
+  } catch {}
+}
+
+document.getElementById('isTest').addEventListener('change', e => {
+  document.getElementById('testLabel').innerHTML = e.target.checked
+    ? 'Modalità <b style="color:var(--warn)">TEST</b>'
+    : 'Allerta <b>REALE</b>';
+});
+
+// =============================================
+//  GITHUB SYNC — scrive alert-state.json
+// =============================================
+const GH_OWNER = 'Test-create-ops';
+const GH_REPO  = 'test-create-ops.github.io';
+const GH_FILE  = 'alert-state.json';
+const GH_API   = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE;
+const GH_TOKEN_KEY = 'kairo_gh_token';
+
+function getGithubToken() { return localStorage.getItem(GH_TOKEN_KEY) || getCookie(GH_TOKEN_KEY); }
+
+function saveGitHubToken() {
+  const t = document.getElementById('ghToken').value.trim();
+  if (!t) { showSyncMsg('Inserisci un token valido.', 'err'); return; }
+  localStorage.setItem(GH_TOKEN_KEY, t);
+  setCookie(GH_TOKEN_KEY, t, COOKIE_DAYS);
+  document.getElementById('ghToken').value = '';
+  checkSyncUI();
+  showSyncMsg('Token salvato!', 'ok');
+  testGitHubToken();
+}
+
+function removeGitHubToken() {
+  localStorage.removeItem(GH_TOKEN_KEY);
+  removeCookie(GH_TOKEN_KEY);
+  checkSyncUI();
+}
+
+function checkSyncUI() {
+  const has = !!getGithubToken();
+  document.getElementById('syncSetup').classList.toggle('hidden', has);
+  document.getElementById('syncActive').classList.toggle('hidden', !has);
+}
+
+function showSyncMsg(msg, type) {
+  const el = document.getElementById('syncMsg');
+  el.innerHTML = '<span style="color:' + (type === 'ok' ? 'var(--ok)' : 'var(--error)') + '">' + msg + '</span>';
+  setTimeout(() => el.innerHTML = '', 5000);
+}
+
+async function testGitHubToken() {
+  const token = getGithubToken();
+  if (!token) { showSyncMsg('Nessun token configurato.', 'err'); return; }
+  try {
+    const resp = await fetch(GH_API, {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (resp.ok) {
+      showSyncMsg('Connessione OK! Token valido.', 'ok');
+    } else if (resp.status === 401) {
+      showSyncMsg('Token non valido o scaduto.', 'err');
+    } else {
+      const data = await resp.json();
+      showSyncMsg('Errore: ' + (data.message || resp.status), 'err');
+    }
+  } catch (e) {
+    showSyncMsg('Errore di rete: ' + e.message, 'err');
+  }
+}
+
+async function pushAlertState(data) {
+  const token = getGithubToken();
+  if (!token) {
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    return { ok: false, msg: 'Nessun token GitHub — salvato solo localmente' };
+  }
+
+  try {
+    // 1. Get current file SHA
+    const getResp = await fetch(GH_API, {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    let sha = '';
+    if (getResp.ok) {
+      const fileData = await getResp.json();
+      sha = fileData.sha;
+    } else if (getResp.status !== 404) {
+      return { ok: false, msg: 'Errore lettura file: ' + getResp.status };
+    }
+
+    // 2. Write file
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    const body = { message: 'Alert state update', content: content };
+    if (sha) body.sha = sha;
+
+    const putResp = await fetch(GH_API, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + token,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (putResp.ok) {
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+      return { ok: true, msg: 'Allerta sincronizzata su GitHub!' };
+    } else {
+      const err = await putResp.json();
+      return { ok: false, msg: 'Errore scrittura: ' + (err.message || putResp.status) };
+    }
+  } catch (e) {
+    return { ok: false, msg: 'Errore rete: ' + e.message };
+  }
+}
+
+function activateAlert() {
+  const data = {
+    active: true,
+    isTest: document.getElementById('isTest').checked,
+    transmitter: document.getElementById('transmitter').value,
+    msgType: document.getElementById('msgType').value,
+    title: document.getElementById('alertTitle').value,
+    message: document.getElementById('alertMessage').value,
+    voiceText: document.getElementById('voiceText').value,
+    timestamp: Date.now()
+  };
+
+  pushAlertState(data).then(result => {
+    refreshStatus();
+    if (result.ok) {
+      showActionMsg(result.msg, 'ok');
+    } else {
+      showActionMsg(result.msg, '');
+    }
+  });
+}
+
+function deactivateAlert() {
+  const data = {
+    active: false,
+    isTest: false,
+    transmitter: '',
+    msgType: '',
+    title: '',
+    message: '',
+    voiceText: '',
+    timestamp: Date.now()
+  };
+
+  pushAlertState(data).then(result => {
+    refreshStatus();
+    if (result.ok) {
+      showActionMsg('Allerta disattivata e sincronizzata.', 'ok');
+    } else {
+      showActionMsg('Allerta disattivata (solo locale).', '');
+    }
+  });
+}
+
+function openAlert() { window.open('alert.html', '_blank'); }
+
+function showActionMsg(msg, type) {
+  const el = document.getElementById('actionMsg');
+  el.innerHTML = '<span style="color:' + (type === 'ok' ? 'var(--ok)' : 'var(--muted)') + ';font-size:13px;font-weight:600;">' + msg + '</span>';
+  setTimeout(() => el.innerHTML = '', 5000);
+}
+
+// Init sync UI
+checkSyncUI();
+</script>
+</body>
+</html>
