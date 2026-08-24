@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Mi } from '../../Mi'
 import { SUPABASE_URL } from '../../../lib/supabase'
+import { installSacApk, SacError } from './sac'
+import { loadSacApps } from '../storage'
 
 /* Il catalogo arriva dalla Edge Function "fdroid": scarica l'indice
    completo lato server e restituisce solo i primi 200 app (~100 KB),
@@ -19,6 +21,21 @@ export default function FPixelStore() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
+  const [installing, setInstalling] = useState<string | null>(null)
+  const [installed, setInstalled] = useState<string[]>(() => loadSacApps().map((a) => a.pkg))
+
+  async function install(pkg: string) {
+    if (installing) return
+    setInstalling(pkg)
+    try {
+      await installSacApk(pkg)
+      setInstalled(loadSacApps().map((a) => a.pkg))
+    } catch (e) {
+      setError(e instanceof SacError ? e.message : 'Installazione fallita')
+    } finally {
+      setInstalling(null)
+    }
+  }
 
   useEffect(() => {
     let alive = true
@@ -85,6 +102,24 @@ export default function FPixelStore() {
               <span>{a.summary}</span>
               <small>{a.packageName}</small>
             </div>
+            <button
+              className={`fpixel-install ${installed.includes(a.packageName) ? 'done' : ''}`}
+              disabled={installing !== null}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                install(a.packageName)
+              }}
+              title="Installa in VOS con SAC"
+            >
+              {installing === a.packageName ? (
+                <Mi n="sync" />
+              ) : installed.includes(a.packageName) ? (
+                <Mi n="check" />
+              ) : (
+                <Mi n="download" />
+              )}
+            </button>
             <Mi n="open_in_new" />
           </a>
         ))}

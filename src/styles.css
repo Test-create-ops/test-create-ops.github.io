@@ -625,3 +625,75 @@ footer p a{color:var(--muted);}
 .vps-output{margin:0 14px 14px;max-height:130px;overflow:auto;border:1px solid #232a3c;border-radius:11px;
   background:#0a0d14;color:#9ee8b8;padding:12px 14px;font-family:ui-monospace,Menlo,monospace;
   font-size:12px;line-height:1.65;}
+
+/* ===================== KairoVOS — SAC (System APK Converter) ===================== */
+.fpixel-install{width:36px;height:36px;border-radius:10px;border:1px solid var(--accent);
+  background:rgba(137,180,250,.12);color:var(--accent);display:flex;align-items:center;
+  justify-content:center;cursor:pointer;flex-shrink:0;transition:background .12s,transform .1s;}
+.fpixel-install:hover{background:rgba(137,180,250,.28);transform:scale(1.08);}
+.fpixel-install:disabled{opacity:.5;cursor:not-allowed;}
+.fpixel-install.done{border-color:var(--ok);color:var(--ok);background:rgba(166,227,161,.12);}
+.fpixel-install .mi{font-size:19px;}
+
+.vos-dock-sep{width:1px;height:44px;background:rgba(255,255,255,.15);margin:0 4px;align-self:center;}
+.vos-dock-icon.sac{overflow:hidden;padding:0;}
+.vos-dock-icon.sac img{width:100%;height:100%;object-fit:cover;border-radius:13px;}
+.vos-dock-icon.sac-folder{background:linear-gradient(145deg,#7a5cff,#5b3fd4);}
+.vos-dock-icon.sac-folder .mi{color:#fff;}
+
+/* Finestra app SAC */
+.sac{height:100%;display:flex;flex-direction:column;gap:14px;padding:16px;background:var(--bg);overflow-y:auto;}
+.sac-banner{display:flex;gap:11px;align-items:flex-start;background:rgba(249,226,175,.09);
+  border:1px solid var(--warn);color:var(--warn);padding:12px 15px;border-radius:12px;
+  font-size:12.5px;line-height:1.6;}
+.sac-banner .mi{font-size:20px;flex-shrink:0;margin-top:2px;}
+.sac-banner b{color:#ffd98a;}
+
+.sac-card{display:flex;align-items:center;gap:16px;background:var(--surface);
+  border:1px solid var(--border);border-radius:15px;padding:15px;}
+.sac-icon{width:64px;height:64px;border-radius:14px;object-fit:cover;flex-shrink:0;
+  border:1px solid var(--border);}
+.sac-icon-fb{display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#33334e,#22223a);}
+.sac-icon-fb .mi{font-size:34px;color:#a6e3a1;}
+.sac-meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+.sac-meta b{font-size:15.5px;}
+.sac-meta small{color:var(--faint);font-family:ui-monospace,Menlo,monospace;font-size:10.5px;}
+.sac-meta span{color:var(--muted);font-size:12px;}
+.sac-del{width:38px;height:38px;border-radius:11px;border:1px solid var(--error);
+  background:rgba(243,139,168,.1);color:var(--error);cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:background .12s;}
+.sac-del:hover{background:rgba(243,139,168,.25);}
+
+.sac-perms{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px 15px;}
+.sac-perms>b{font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);}
+.sac-perm-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+.sac-perm-list code{background:var(--bg);border:1px solid var(--border);color:var(--text);
+  font-size:11px;padding:3px 9px;border-radius:7px;}
+
+.sac-templates{margin-top:auto;}
+.sac-templates>b{font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);}
+.sac-tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:9px;}
+.sac-tpl{display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 6px;
+  background:var(--surface);border:1px dashed var(--border);border-radius:12px;color:var(--text);
+  font-size:11.5px;font-weight:700;cursor:not-allowed;opacity:.65;}
+.sac-tpl .mi{font-size:22px;color:var(--accent);}
+
+.sac-mine{padding:10px;display:flex;flex-direction:column;gap:5px;background:var(--bg);min-height:100%;}
+.sac-mine-row{display:flex;align-items:center;gap:14px;padding:10px 13px;border:none;border-radius:13px;
+  background:transparent;color:var(--text);cursor:pointer;text-align:left;transition:background .1s;}
+.sac-mine-row:hover{background:var(--button);}
+.sac-mine-row img,.sac-mine-row .sac-icon-fb{width:42px;height:42px;border-radius:10px;object-fit:cover;
+  flex-shrink:0;}
+.sac-mine-row .sac-icon-fb{display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#33334e,#22223a);}
+.sac-mine-row div{flex:1;min-width:0;}
+.sac-mine-row b{font-size:13.5px;display:block;}
+.sac-mine-row small{color:var(--faint);font-size:10.5px;font-family:ui-monospace,Menlo,monospace;}
+.sac-mine-row>.mi{color:var(--faint);}
+
+.sac-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;text-align:center;padding:30px;background:var(--bg);}
+.sac-empty .mi{font-size:52px;color:var(--faint);}
+.sac-empty p{color:var(--muted);font-size:13px;line-height:1.6;max-width:300px;}
+.sac-empty .vps-btn{margin-top:10px;}

@@ -27,5 +27,40 @@ export function saveVosConfig(config: VosConfig): void {
 }
 
 export function resetVosConfig(): void {
-  localStorage.removeItem(KEY)
+  localStorage.removeItem('kairo-vos-config')
+}
+
+/* ── App installate via SAC (System APK Converter) ── */
+export interface SacAppData {
+  pkg: string
+  name: string
+  version: string
+  icon: string // dataURL
+  permissions: string[]
+  installedAt: number
+}
+
+const SAC_KEY = 'kairo-vos-sac-apps'
+
+export function loadSacApps(): SacAppData[] {
+  try {
+    const raw = localStorage.getItem(SAC_KEY)
+    if (raw) return JSON.parse(raw) as SacAppData[]
+  } catch {
+    /* ignore */
+  }
+  return []
+}
+
+export function saveSacApps(apps: SacAppData[]): void {
+  localStorage.setItem(SAC_KEY, JSON.stringify(apps))
+}
+
+export function addSacApp(app: SacAppData): void {
+  const list = loadSacApps().filter((a) => a.pkg !== app.pkg)
+  saveSacApps([...list, app])
+}
+
+export function removeSacApp(pkg: string): void {
+  saveSacApps(loadSacApps().filter((a) => a.pkg !== pkg))
 }
