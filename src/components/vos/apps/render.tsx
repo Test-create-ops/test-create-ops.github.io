@@ -21,6 +21,7 @@ import {
 import VisualPixelStudio from './VisualPixelStudio'
 import FPixelStore from './FPixelStore'
 import SacApp from './SacApp'
+import SacConsole from './SacConsole'
 
 export function renderVosApp(
   appId: string,
@@ -34,6 +35,8 @@ export function renderVosApp(
   }
 
   switch (appId) {
+    case 'sac':
+      return <SacConsole />
     case 'vps':
       return <VisualPixelStudio />
     case 'fpixel':
