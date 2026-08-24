@@ -840,3 +840,7 @@ footer p a{color:var(--muted);}
 .vfolder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;}
 .vfolder .mi{font-size:56px;color:var(--accent);}
 .vfolder p{color:var(--faint);font-size:12.5px;}
+
+/* Arte SVG inline nelle celle emoji */
+.vemo-art{display:block;width:30px;height:30px;}
+.vemo-art svg{width:100%;height:100%;display:block;}

@@ -103,4 +103,39 @@ for (const e of chosen) {
 }
 
 fs.writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify(manifest))
+
+/* Versione inline per il bundle: niente richieste di rete, zero problemi di cache */
+const read = (p) => {
+  try {
+    return fs.readFileSync(p, 'utf8')
+  } catch {
+    return ''
+  }
+}
+
+const ts = `// Generato da tools/gen-emoji-subset.mjs — NON modificare a mano.
+export interface VEmoji {
+  hex: string
+  char: string
+  name: string
+  group: string
+  fx: boolean
+  om: boolean
+  fxSvg: string
+  omSvg: string
+}
+
+export const EMOJIS: VEmoji[] = [
+${manifest
+  .map((m) => {
+    const fxSvg = m.fx ? read(path.join(OUT, 'fxemoji', `${m.hex}.svg`)) : ''
+    const omSvg = m.om ? read(path.join(OUT, 'openmoji', `${m.hex}.svg`)) : ''
+    const esc = (s) => s.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${')
+    return `  { hex: '${m.hex}', char: '${m.char.replace(/'/g, "\\'")}', name: ${JSON.stringify(m.name)}, group: ${JSON.stringify(m.group)}, fx: ${m.fx}, om: ${m.om},\n    fxSvg: \`${esc(fxSvg)}\`, omSvg: \`${esc(omSvg)}\` },`
+  })
+  .join('\n')}
+]
+`
+fs.writeFileSync(path.join(root, 'src/components/vos/apps/emojiData.ts'), ts)
+
 console.log(`fatto: ${manifest.length} voci · openmoji ok · fxemoji abbinate: ${fxOk}`)
