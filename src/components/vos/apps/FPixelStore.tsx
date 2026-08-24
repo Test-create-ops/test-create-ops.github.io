@@ -1,35 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Mi } from '../../Mi'
+import { SUPABASE_URL } from '../../../lib/supabase'
 
-/* L'indice completo pesa ~59 MB: proviamo diretto e poi i proxy CORS */
-const FDROID_INDEX = 'https://f-droid.org/repo/index-v1.json'
-const INDEX_PROXIES = [
-  (u: string) => u,
-  (u: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-  (u: string) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
-]
+/* Il catalogo arriva dalla Edge Function "fdroid": scarica l'indice
+   completo lato server e restituisce solo i primi 200 app (~100 KB),
+   senza problemi di CORS. */
+const FDROID_ENDPOINT = SUPABASE_URL + '/functions/v1/fdroid'
 
 interface FdApp {
   packageName: string
-  name?: { en?: string; it?: string }
-  summary?: { en?: string; it?: string }
-  icon?: { en?: string }
-  localized?: { en?: { name?: string; summary?: string; icon?: { en?: string } } }
-}
-
-function appName(a: FdApp): string {
-  return a.localized?.en?.name || a.name?.en || a.name?.it || a.packageName
-}
-
-function appSummary(a: FdApp): string {
-  return a.localized?.en?.summary || a.summary?.en || a.summary?.it || ''
-}
-
-function appIcon(a: FdApp): string {
-  const path = a.localized?.en?.icon?.en || a.icon?.en
-  if (!path) return ''
-  if (path.startsWith('http')) return path
-  return `https://f-droid.org/repo/${path}`
+  name: string
+  summary: string
+  icon: string
 }
 
 export default function FPixelStore() {
@@ -40,31 +22,22 @@ export default function FPixelStore() {
 
   useEffect(() => {
     let alive = true
-    ;(async () => {
-      let lastErr: unknown = null
-      for (const wrap of INDEX_PROXIES) {
-        try {
-          const r = await fetch(wrap(FDROID_INDEX))
-          if (!r.ok) throw new Error(`HTTP ${r.status}`)
-          const data = await r.json()
-          if (!alive) return
-          const list: FdApp[] = data?.apps || []
-          setApps(list.slice(0, 200))
-          setError('')
-          setLoading(false)
-          return
-        } catch (e) {
-          lastErr = e
-        }
-      }
-      if (!alive) return
-      setError(
-        lastErr instanceof Error
-          ? `${lastErr.message} — F-Droid blocca le richieste dal browser (CORS)`
-          : 'Errore rete',
-      )
-      setLoading(false)
-    })()
+    fetch(FDROID_ENDPOINT)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json()
+      })
+      .then((data) => {
+        if (!alive) return
+        if (data?.error) throw new Error(data.error)
+        setApps((data?.apps ?? []) as FdApp[])
+        setLoading(false)
+      })
+      .catch((e) => {
+        if (!alive) return
+        setError(e instanceof Error ? e.message : 'Errore rete')
+        setLoading(false)
+      })
     return () => {
       alive = false
     }
@@ -73,7 +46,7 @@ export default function FPixelStore() {
   const filtered = apps.filter((a) => {
     const q = query.toLowerCase()
     if (!q) return true
-    return appName(a).toLowerCase().includes(q) || a.packageName.toLowerCase().includes(q)
+    return a.name.toLowerCase().includes(q) || a.packageName.toLowerCase().includes(q)
   })
 
   return (
@@ -91,7 +64,7 @@ export default function FPixelStore() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      {loading && <p className="fpixel-status"><Mi n="sync" /> Caricamento index.json…</p>}
+      {loading && <p className="fpixel-status"><Mi n="sync" /> Caricamento catalogo…</p>}
       {error && <p className="fpixel-err"><Mi n="error" /> {error}</p>}
       <div className="fpixel-list">
         {filtered.map((a) => (
@@ -102,14 +75,14 @@ export default function FPixelStore() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            {appIcon(a) ? (
-              <img src={appIcon(a)} alt="" />
+            {a.icon ? (
+              <img src={a.icon} alt="" loading="lazy" />
             ) : (
               <span className="fpixel-fallback"><Mi n="android" /></span>
             )}
             <div>
-              <b>{appName(a)}</b>
-              <span>{appSummary(a)}</span>
+              <b>{a.name}</b>
+              <span>{a.summary}</span>
               <small>{a.packageName}</small>
             </div>
             <Mi n="open_in_new" />
