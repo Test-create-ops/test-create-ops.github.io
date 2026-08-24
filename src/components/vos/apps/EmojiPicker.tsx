@@ -13,9 +13,36 @@ interface EmojiEntry {
 
 type Pack = 'fx' | 'om'
 
+/* Cella emoji: mostra l'immagine del pack; se non carica, usa il carattere nativo */
+function Cell({
+  entry,
+  pack,
+  onClick,
+}: {
+  entry: EmojiEntry
+  pack: Pack
+  onClick: () => void
+}) {
+  const [broken, setBroken] = useState(false)
+  return (
+    <button title={`${entry.name} — clicca per copiare`} onClick={onClick}>
+      {!broken ? (
+        <img
+          src={`/emoji/${pack}/${entry.hex}.svg`}
+          alt={entry.char}
+          loading="lazy"
+          onError={() => setBroken(true)}
+        />
+      ) : (
+        <span className="vemo-char">{entry.char}</span>
+      )}
+    </button>
+  )
+}
+
 export default function EmojiPicker() {
   const [all, setAll] = useState<EmojiEntry[]>([])
-  const [pack, setPack] = useState<Pack>('fx')
+  const [pack, setPack] = useState<Pack>('om')
   const [query, setQuery] = useState('')
   const [recent, setRecent] = useState<string[]>(() => {
     try {
@@ -29,7 +56,7 @@ export default function EmojiPicker() {
   useEffect(() => {
     fetch('/emoji/manifest.json')
       .then((r) => r.json())
-      .then((d) => setAll(d))
+      .then((d) => Array.isArray(d) && setAll(d))
       .catch(() => setAll([]))
   }, [])
 
@@ -61,21 +88,11 @@ export default function EmojiPicker() {
   return (
     <div className="vemo">
       <div className="vemo-tabs">
-        <button
-          className={pack === 'fx' ? 'on' : ''}
-          onClick={() => setPack('fx')}
-          title="Mozilla fxemoji (Firefox OS)"
-        >
-          <img src="/emoji/fxemoji/1F600.svg" alt="" />
-          fxemoji <small>{counts.fx}</small>
+        <button className={pack === 'fx' ? 'on' : ''} onClick={() => setPack('fx')}>
+          <Mi n="mood" /> fxemoji <small>{counts.fx}</small>
         </button>
-        <button
-          className={pack === 'om' ? 'on' : ''}
-          onClick={() => setPack('om')}
-          title="OpenMoji"
-        >
-          <img src="/emoji/openmoji/1F600.svg" alt="" />
-          OpenMoji <small>{counts.om}</small>
+        <button className={pack === 'om' ? 'on' : ''} onClick={() => setPack('om')}>
+          <Mi n="sentiment_satisfied" /> OpenMoji <small>{counts.om}</small>
         </button>
         <input
           className="vemo-search"
@@ -93,11 +110,9 @@ export default function EmojiPicker() {
           <div className="vemo-grid">
             {recent.map((char) => {
               const e = all.find((x) => x.char === char)
-              if (!e) return null
+              if (!e || !e[pack]) return null
               return (
-                <button key={char} title={e.name} onClick={() => click(e)}>
-                  <img src={`/emoji/${pack}/${e.hex}.svg`} alt={e.name} loading="lazy" />
-                </button>
+                <Cell key={char} entry={e} pack={pack} onClick={() => click(e)} />
               )
             })}
           </div>
@@ -108,9 +123,7 @@ export default function EmojiPicker() {
         {list.length === 0 && <p className="vemo-empty">Nessuna emoji trovata</p>}
         <div className="vemo-grid">
           {list.map((e) => (
-            <button key={e.hex} title={`${e.name} — clicca per copiare`} onClick={() => click(e)}>
-              <img src={`/emoji/${pack}/${e.hex}.svg`} alt={e.name} loading="lazy" />
-            </button>
+            <Cell key={e.hex} entry={e} pack={pack} onClick={() => click(e)} />
           ))}
         </div>
       </div>

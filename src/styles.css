@@ -823,7 +823,10 @@ footer p a{color:var(--muted);}
 .vemo-scroll{flex:1;overflow-y:auto;padding:12px 15px;}
 .vemo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:4px;}
 .vemo-grid button{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
-  background:none;border:none;border-radius:10px;padding:6px;cursor:pointer;transition:background .1s,transform .1s;}
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px;
+  cursor:pointer;transition:background .1s,transform .1s,border-color .1s;}
+.vemo-grid button:hover{border-color:var(--accent);}
+.vemo-char{font-size:26px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;}
 .vemo-grid button:hover{background:var(--button);transform:scale(1.18);}
 .vemo-grid img{width:30px;height:30px;}
 .vemo-empty{text-align:center;color:var(--faint);padding:34px;font-size:13px;}
