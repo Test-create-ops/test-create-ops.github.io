@@ -3,7 +3,8 @@ import Dock from './Dock'
 import VosWindow, { type VosWindowState } from './VosWindow'
 import { getApp } from './apps/registry'
 import { renderVosApp } from './apps/render'
-import type { VosConfig } from './storage'
+import type { VosConfig, SacAppData } from './storage'
+import { loadSacApps } from './storage'
 import { Mi } from '../Mi'
 
 let winSeq = 1
@@ -40,8 +41,17 @@ export default function Desktop({
         setZTop((z) => z + 1)
         return
       }
-      const app = getApp(appId)
-      if (!app) return
+      // Le app SAC non sono nel registry statico: ricaviamo il titolo dallo storage
+      let title = getApp(appId)?.name
+      if (!title && appId.startsWith('sac:')) {
+        const pkg = appId.slice(4)
+        const sacApp = loadSacApps().find((a) => a.pkg === pkg)
+        if (!sacApp) return
+        title = sacApp.name
+      } else if (!title && appId === 'sac-installed') {
+        title = 'Le mie app SAC'
+      }
+      if (!title) return
       const size = DEFAULTS[appId] || { w: 520, h: 380 }
       const id = `win-${winSeq++}`
       const offset = (windows.length % 6) * 28
@@ -50,7 +60,7 @@ export default function Desktop({
         {
           id,
           appId,
-          title: app.name,
+          title,
           x: 80 + offset,
           y: 48 + offset,
           w: size.w,
