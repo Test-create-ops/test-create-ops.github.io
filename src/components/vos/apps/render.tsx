@@ -22,6 +22,8 @@ import VisualPixelStudio from './VisualPixelStudio'
 import FPixelStore from './FPixelStore'
 import SacApp from './SacApp'
 import SacConsole from './SacConsole'
+import EmojiPicker from './EmojiPicker'
+import { TextDoc, FolderView } from './DeskDocs'
 
 export function renderVosApp(
   appId: string,
@@ -34,9 +36,14 @@ export function renderVosApp(
     if (app) return <SacApp app={app} />
   }
 
+  if (appId.startsWith('text:')) return <TextDoc itemId={appId.slice(5)} />
+  if (appId.startsWith('folder:')) return <FolderView itemId={appId.slice(7)} />
+
   switch (appId) {
     case 'sac':
       return <SacConsole />
+    case 'emoji':
+      return <EmojiPicker />
     case 'vps':
       return <VisualPixelStudio />
     case 'fpixel':

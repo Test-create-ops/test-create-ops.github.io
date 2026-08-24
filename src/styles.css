@@ -777,3 +777,63 @@ footer p a{color:var(--muted);}
 .sac-perms-details{font-size:12px;color:var(--muted);}
 .sac-perms-details summary{cursor:pointer;user-select:none;}
 .sac-perms-details .sac-perm-list{margin-top:9px;}
+
+/* ===================== KairoVOS — Menu contestuale ===================== */
+.vos-ctx{position:fixed;z-index:3000;min-width:200px;background:rgba(28,28,44,.96);
+  backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:12px;
+  padding:5px;box-shadow:0 18px 50px rgba(0,0,0,.6);animation:vos-ctx-in .1s ease-out;}
+@keyframes vos-ctx-in{from{opacity:0;transform:scale(.95) translateY(-4px);}to{opacity:1;transform:none;}}
+.vos-ctx-item{position:relative;display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  background:none;border:none;color:var(--text);font-size:13px;font-weight:600;padding:8px 12px;
+  border-radius:8px;cursor:pointer;}
+.vos-ctx-item:hover{background:var(--accent);color:#11111b;}
+.vos-ctx-item:hover .mi{color:#11111b;}
+.vos-ctx-item .mi{font-size:19px;color:var(--muted);}
+.vos-ctx-item.has-sub .vos-ctx-arrow{margin-left:auto;font-size:17px;}
+.vos-ctx-sep{height:1px;background:rgba(255,255,255,.09);margin:4px 8px;}
+.vos-ctx-sub{top:-6px;left:calc(100% + 2px);min-width:190px;}
+
+/* Icone sul desktop */
+.vos-desk-icons{position:absolute;top:42px;left:10px;z-index:1;display:flex;flex-direction:column;
+  flex-wrap:wrap;gap:6px;max-height:calc(100% - 130px);}
+.vos-desk-icon{width:88px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:9px 4px;border-radius:11px;cursor:pointer;user-select:none;text-align:center;
+  border:1px solid transparent;transition:background .1s;}
+.vos-desk-icon:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1);}
+.vos-desk-icon .mi{font-size:40px;color:#ffd469;text-shadow:0 3px 10px rgba(0,0,0,.5);}
+.vos-desk-icon.text .mi{color:#89b4fa;}
+.vos-desk-icon span{font-size:11px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.85);
+  line-height:1.3;word-break:break-word;}
+
+/* ===================== KairoVOS — Emoji Picker (fxemoji + OpenMoji) ===================== */
+.vemo{height:100%;display:flex;flex-direction:column;background:var(--bg);}
+.vemo-tabs{display:flex;align-items:center;gap:7px;padding:11px 13px;border-bottom:1px solid var(--border);}
+.vemo-tabs button{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);
+  border-radius:10px;color:var(--muted);font-size:12.5px;font-weight:700;padding:7px 14px;cursor:pointer;}
+.vemo-tabs button img{width:19px;height:19px;}
+.vemo-tabs button.on{border-color:var(--accent);color:var(--accent);background:rgba(137,180,250,.1);}
+.vemo-tabs small{color:var(--faint);font-weight:600;}
+.vemo-search{margin-left:auto;width:150px;padding:7px 13px;border-radius:99px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);font-size:12.5px;}
+.vemo-search:focus{outline:none;border-color:var(--accent);}
+
+.vemo-sub{display:flex;align-items:center;gap:7px;padding:10px 15px 0;font-size:11px;font-weight:800;
+  letter-spacing:.8px;text-transform:uppercase;color:var(--faint);}
+.vemo-sub .mi{font-size:14px;}
+.vemo-scroll{flex:1;overflow-y:auto;padding:12px 15px;}
+.vemo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:4px;}
+.vemo-grid button{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  background:none;border:none;border-radius:10px;padding:6px;cursor:pointer;transition:background .1s,transform .1s;}
+.vemo-grid button:hover{background:var(--button);transform:scale(1.18);}
+.vemo-grid img{width:30px;height:30px;}
+.vemo-empty{text-align:center;color:var(--faint);padding:34px;font-size:13px;}
+.vemo-hint{text-align:center;color:var(--faint);font-size:10.5px;padding:0 0 9px;margin:0;}
+
+/* Doc testo e cartella dal menu Nuova */
+.vtextdoc,.vfolder{height:100%;background:var(--bg);}
+.vtextdoc textarea{width:100%;height:100%;resize:none;border:none;background:none;color:var(--text);
+  padding:16px;font-size:14px;line-height:1.75;font-family:inherit;}
+.vtextdoc textarea:focus{outline:none;}
+.vfolder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;}
+.vfolder .mi{font-size:56px;color:var(--accent);}
+.vfolder p{color:var(--faint);font-size:12.5px;}

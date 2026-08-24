@@ -64,3 +64,27 @@ export function addSacApp(app: SacAppData): void {
 export function removeSacApp(pkg: string): void {
   saveSacApps(loadSacApps().filter((a) => a.pkg !== pkg))
 }
+
+/* ── Icone sul desktop VOS (Nuova cartella / Nuovo documento) ── */
+export interface DeskItem {
+  id: string
+  type: 'folder' | 'text'
+  name: string
+  content: string
+}
+
+const DESK_KEY = 'kairo-vos-desktop'
+
+export function loadDeskItems(): DeskItem[] {
+  try {
+    const raw = localStorage.getItem(DESK_KEY)
+    if (raw) return JSON.parse(raw)
+  } catch {
+    /* ignore */
+  }
+  return []
+}
+
+export function saveDeskItems(items: DeskItem[]): void {
+  localStorage.setItem(DESK_KEY, JSON.stringify(items))
+}

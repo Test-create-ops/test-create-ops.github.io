@@ -7,6 +7,7 @@ export interface VosAppDef {
 
 export const VOS_APPS: VosAppDef[] = [
   { id: 'sac', name: 'SAC Console', icon: 'terminal', dock: true },
+  { id: 'emoji', name: 'Emoji', icon: 'mood', dock: false },
   { id: 'vps', name: 'Visual Pixel Studio', icon: 'code', dock: true },
   { id: 'fpixel', name: 'F-Pixel Store', icon: 'shop', dock: true },
   { id: 'terminal', name: 'Terminal', icon: 'terminal', dock: true },

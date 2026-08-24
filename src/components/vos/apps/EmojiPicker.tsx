@@ -1,0 +1,120 @@
+import { useEffect, useMemo, useState } from 'react'
+import { useToast } from '../../Toast'
+import { Mi } from '../../Mi'
+
+interface EmojiEntry {
+  hex: string
+  char: string
+  name: string
+  group: string
+  om: boolean
+  fx: boolean
+}
+
+type Pack = 'fx' | 'om'
+
+export default function EmojiPicker() {
+  const [all, setAll] = useState<EmojiEntry[]>([])
+  const [pack, setPack] = useState<Pack>('fx')
+  const [query, setQuery] = useState('')
+  const [recent, setRecent] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('vos-emoji-recent') ?? '[]')
+    } catch {
+      return []
+    }
+  })
+  const { toast } = useToast()
+
+  useEffect(() => {
+    fetch('/emoji/manifest.json')
+      .then((r) => r.json())
+      .then((d) => setAll(d))
+      .catch(() => setAll([]))
+  }, [])
+
+  const list = useMemo(
+    () =>
+      all.filter(
+        (e) =>
+          e[pack] &&
+          (!query ||
+            e.name.toLowerCase().includes(query.toLowerCase()) ||
+            e.char === query),
+      ),
+    [all, pack, query],
+  )
+
+  const counts = {
+    fx: all.filter((e) => e.fx).length,
+    om: all.filter((e) => e.om).length,
+  }
+
+  function click(e: EmojiEntry) {
+    navigator.clipboard?.writeText(e.char).catch(() => {})
+    const next = [e.char, ...recent.filter((c) => c !== e.char)].slice(0, 16)
+    setRecent(next)
+    localStorage.setItem('vos-emoji-recent', JSON.stringify(next))
+    toast(`Emoji ${e.char} copiata!`)
+  }
+
+  return (
+    <div className="vemo">
+      <div className="vemo-tabs">
+        <button
+          className={pack === 'fx' ? 'on' : ''}
+          onClick={() => setPack('fx')}
+          title="Mozilla fxemoji (Firefox OS)"
+        >
+          <img src="/emoji/fxemoji/1F600.svg" alt="" />
+          fxemoji <small>{counts.fx}</small>
+        </button>
+        <button
+          className={pack === 'om' ? 'on' : ''}
+          onClick={() => setPack('om')}
+          title="OpenMoji"
+        >
+          <img src="/emoji/openmoji/1F600.svg" alt="" />
+          OpenMoji <small>{counts.om}</small>
+        </button>
+        <input
+          className="vemo-search"
+          placeholder="Cerca…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
+      {recent.length > 0 && !query && (
+        <>
+          <div className="vemo-sub">
+            <Mi n="schedule" /> Recenti
+          </div>
+          <div className="vemo-grid">
+            {recent.map((char) => {
+              const e = all.find((x) => x.char === char)
+              if (!e) return null
+              return (
+                <button key={char} title={e.name} onClick={() => click(e)}>
+                  <img src={`/emoji/${pack}/${e.hex}.svg`} alt={e.name} loading="lazy" />
+                </button>
+              )
+            })}
+          </div>
+        </>
+      )}
+
+      <div className="vemo-scroll">
+        {list.length === 0 && <p className="vemo-empty">Nessuna emoji trovata</p>}
+        <div className="vemo-grid">
+          {list.map((e) => (
+            <button key={e.hex} title={`${e.name} — clicca per copiare`} onClick={() => click(e)}>
+              <img src={`/emoji/${pack}/${e.hex}.svg`} alt={e.name} loading="lazy" />
+            </button>
+          ))}
+        </div>
+      </div>
+      <p className="vemo-hint">Clicca una emoji per copiarla negli appunti</p>
+    </div>
+  )
+}
