@@ -14,34 +14,58 @@ interface VEmoji {
 }
 
 type Pack = 'fx' | 'om'
+type CopyMode = 'text' | 'image'
 
-/* Arte SVG inline: nessuna richiesta di rete, niente cache che fallisce */
 function Art({ e, pack }: { e: VEmoji; pack: Pack }) {
   const svg = pack === 'fx' ? e.fxSvg : e.omSvg
   if (svg) {
     return (
-      <span
-        className="vemo-art"
-        aria-label={e.name}
-        dangerouslySetInnerHTML={{ __html: svg }}
-      />
+      <span className="vemo-art" aria-label={e.name} dangerouslySetInnerHTML={{ __html: svg }} />
     )
   }
   return <span className="vemo-char">{e.char}</span>
 }
 
+/* Rasterizza l'SVG del pack in PNG */
+async function svgToPngBlob(svg: string, size = 128): Promise<Blob> {
+  const blobUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }))
+  try {
+    const img = new Image()
+    await new Promise<void>((res, rej) => {
+      img.onload = () => res()
+      img.onerror = () => rej(new Error('svg load'))
+      img.src = blobUrl
+    })
+    const canvas = document.createElement('canvas')
+    canvas.width = canvas.height = size
+    const ctx = canvas.getContext('2d')!
+    ctx.drawImage(img, 0, 0, size, size)
+    return await new Promise<Blob>((res, rej) =>
+      canvas.toBlob((b) => (b ? res(b) : rej(new Error('toBlob'))), 'image/png'),
+    )
+  } finally {
+    URL.revokeObjectURL(blobUrl)
+  }
+}
+
 function Cell({
   e,
   pack,
+  mode,
   onClick,
 }: {
   e: VEmoji
   pack: Pack
+  mode: CopyMode
   onClick: () => void
 }) {
   return (
-    <button title={`${e.name} — clicca per copiare`} onClick={onClick}>
+    <button
+      title={mode === 'image' ? `${e.name} — copia immagine` : `${e.name} — copia carattere`}
+      onClick={onClick}
+    >
       <Art e={e} pack={pack} />
+      {mode === 'image' && <span className="vemo-badge"><Mi n="image" /></span>}
     </button>
   )
 }
@@ -49,6 +73,7 @@ function Cell({
 export default function EmojiPicker() {
   const [all, setAll] = useState<VEmoji[]>([])
   const [pack, setPack] = useState<Pack>('om')
+  const [mode, setMode] = useState<CopyMode>('text')
   const [query, setQuery] = useState('')
   const [recent, setRecent] = useState<string[]>(() => {
     try {
@@ -59,7 +84,6 @@ export default function EmojiPicker() {
   })
   const { toast } = useToast()
 
-  // I dati SVG viaggiano in un chunk separato: caricati solo quando serve
   useEffect(() => {
     let alive = true
     import('./emojiData').then((m) => {
@@ -85,12 +109,37 @@ export default function EmojiPicker() {
     om: all.filter((e) => e.om).length,
   }
 
+  async function copyImage(e: VEmoji) {
+    const svg = pack === 'fx' ? e.fxSvg : e.omSvg
+    if (!svg) return toast('Nessuna immagine per questa emoji')
+    try {
+      const png = await svgToPngBlob(svg)
+      // Safari richiede che ClipboardItem venga creato dentro il gesto utente:
+      // usiamo la promise form direttamente supportata da Chrome/Safari moderni
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': png }),
+      ])
+      toast('Immagine copiata! Incolla dove vuoi')
+    } catch {
+      // Fallback: scarico il PNG
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(await svgToPngBlob(svg))
+      a.download = `${e.hex}.png`
+      a.click()
+      toast('Clipboard non disponibile — PNG scaricato')
+    }
+  }
+
   function click(e: VEmoji) {
+    if (mode === 'image') {
+      copyImage(e)
+      return
+    }
     navigator.clipboard?.writeText(e.char).catch(() => {})
     const next = [e.char, ...recent.filter((c) => c !== e.char)].slice(0, 16)
     setRecent(next)
     localStorage.setItem('vos-emoji-recent', JSON.stringify(next))
-    toast(`Emoji ${e.char} copiata!`)
+    toast(`Emoji ${e.char} copiata! (il disegno dipende dall'app di destinazione)`)
   }
 
   const tabs: ReactNode = (
@@ -120,7 +169,7 @@ export default function EmojiPicker() {
           {recent.map((char) => {
             const e = all.find((x) => x.char === char)
             if (!e || !e[pack]) return null
-            return <Cell key={char} e={e} pack={pack} onClick={() => click(e)} />
+            return <Cell key={char} e={e} pack={pack} mode={mode} onClick={() => click(e)} />
           })}
         </div>
       </>
@@ -129,6 +178,17 @@ export default function EmojiPicker() {
   return (
     <div className="vemo">
       {tabs}
+
+      <div className="vemo-modebar">
+        <span>Copia come:</span>
+        <button className={!mode || mode === 'text' ? 'on' : ''} onClick={() => setMode('text')}>
+          <Mi n="text_fields" /> Testo
+        </button>
+        <button className={mode === 'image' ? 'on' : ''} onClick={() => setMode('image')}>
+          <Mi n="image" /> Immagine
+        </button>
+      </div>
+
       {all.length === 0 ? (
         <p className="vemo-empty">Caricamento emoji…</p>
       ) : (
@@ -138,13 +198,17 @@ export default function EmojiPicker() {
             {list.length === 0 && <p className="vemo-empty">Nessuna emoji trovata</p>}
             <div className="vemo-grid">
               {list.map((e) => (
-                <Cell key={e.hex} e={e} pack={pack} onClick={() => click(e)} />
+                <Cell key={e.hex} e={e} pack={pack} mode={mode} onClick={() => click(e)} />
               ))}
             </div>
           </div>
         </>
       )}
-      <p className="vemo-hint">Clicca una emoji per copiarla negli appunti</p>
+      <p className="vemo-hint">
+        {mode === 'text'
+          ? 'Testo: il disegno lo sceglie l’app dove incolli (su Mac = Apple)'
+          : 'Immagine: incolla il disegno vero di fx/OpenMoji'}
+      </p>
     </div>
   )
 }
