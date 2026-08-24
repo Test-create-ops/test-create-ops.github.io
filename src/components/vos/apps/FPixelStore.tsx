@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Mi } from '../../Mi'
 
-const FDROID_INDEX = 'https://f-droid.org/repo/index.json'
+/* L'indice completo pesa ~59 MB: proviamo diretto e poi i proxy CORS */
+const FDROID_INDEX = 'https://f-droid.org/repo/index-v1.json'
+const INDEX_PROXIES = [
+  (u: string) => u,
+  (u: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  (u: string) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+]
 
 interface FdApp {
   packageName: string
@@ -33,17 +39,35 @@ export default function FPixelStore() {
   const [query, setQuery] = useState('')
 
   useEffect(() => {
-    fetch(FDROID_INDEX)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`)
-        return r.json()
-      })
-      .then((data) => {
-        const list: FdApp[] = data?.apps || []
-        setApps(list.slice(0, 200))
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : 'Errore rete'))
-      .finally(() => setLoading(false))
+    let alive = true
+    ;(async () => {
+      let lastErr: unknown = null
+      for (const wrap of INDEX_PROXIES) {
+        try {
+          const r = await fetch(wrap(FDROID_INDEX))
+          if (!r.ok) throw new Error(`HTTP ${r.status}`)
+          const data = await r.json()
+          if (!alive) return
+          const list: FdApp[] = data?.apps || []
+          setApps(list.slice(0, 200))
+          setError('')
+          setLoading(false)
+          return
+        } catch (e) {
+          lastErr = e
+        }
+      }
+      if (!alive) return
+      setError(
+        lastErr instanceof Error
+          ? `${lastErr.message} — F-Droid blocca le richieste dal browser (CORS)`
+          : 'Errore rete',
+      )
+      setLoading(false)
+    })()
+    return () => {
+      alive = false
+    }
   }, [])
 
   const filtered = apps.filter((a) => {
