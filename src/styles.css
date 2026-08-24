@@ -443,3 +443,185 @@ footer p a{color:var(--muted);}
 .vos-dock-label{position:absolute;bottom:calc(100% + 11px);left:50%;transform:translateX(-50%);
   white-space:nowrap;background:rgba(13,13,22,.92);border:1px solid var(--border);color:var(--text);
   font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:8px;pointer-events:none;}
+
+/* ===================== KairoVOS — App interne ===================== */
+
+/* ---- Terminal ---- */
+.vos-app-term{height:100%;display:flex;flex-direction:column;background:#0a0c12;}
+.vos-app-term-out{flex:1;overflow-y:auto;padding:14px;font-family:ui-monospace,Menlo,monospace;
+  font-size:13px;line-height:1.75;color:#9ee8b8;}
+.vos-app-term-out::-webkit-scrollbar{width:8px;}
+.vos-app-term-out::-webkit-scrollbar-thumb{background:#2a2f42;border-radius:4px;}
+.vos-app-term form{display:flex;align-items:center;gap:8px;padding:10px 14px;
+  border-top:1px solid #1d2233;color:var(--accent);}
+.vos-app-term form .mi{font-size:18px;}
+.vos-app-term form input{flex:1;background:none;border:none;color:#e6edf6;
+  font-family:ui-monospace,Menlo,monospace;font-size:13px;}
+.vos-app-term form input:focus{outline:none;}
+
+/* ---- Calculator ---- */
+.vos-calc{display:flex;flex-direction:column;height:100%;padding:16px;gap:14px;background:var(--bg);}
+.vos-calc-display{flex-shrink:0;background:#0a0c12;border:1px solid var(--border);border-radius:13px;
+  padding:18px;text-align:right;font-size:30px;font-weight:300;font-family:ui-monospace,Menlo,monospace;
+  color:#e6edf6;overflow-x:auto;white-space:nowrap;}
+.vos-calc-keys{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
+.vos-calc-keys button{border:1px solid var(--border);border-radius:11px;background:var(--surface);
+  color:var(--text);font-size:19px;font-weight:600;cursor:pointer;transition:background .1s,transform .08s;}
+.vos-calc-keys button:hover{background:var(--button-hover);}
+.vos-calc-keys button:active{transform:scale(.94);}
+.vos-calc-keys button.wide{grid-column:span 4;background:#7a3b3b;color:#ffd9d9;}
+
+/* ---- Notes ---- */
+.vos-notes{width:100%;height:100%;resize:none;border:none;background:var(--bg);color:var(--text);
+  padding:18px;font-size:14.5px;line-height:1.8;font-family:inherit;}
+.vos-notes:focus{outline:none;}
+
+/* ---- Files ---- */
+.vos-files{padding:10px;background:var(--bg);min-height:100%;}
+.vos-file-row{display:flex;align-items:center;gap:13px;padding:11px 14px;border-radius:11px;
+  font-size:14px;font-weight:600;cursor:pointer;transition:background .1s;}
+.vos-file-row:hover{background:var(--button);}
+.vos-file-row .mi{color:var(--accent);font-size:24px;}
+
+/* ---- Navigator ---- */
+.vos-nav{height:100%;display:flex;flex-direction:column;background:var(--bg);}
+.vos-nav form{display:flex;align-items:center;gap:9px;padding:10px 13px;
+  border-bottom:1px solid var(--border);}
+.vos-nav form .mi:first-child{color:var(--muted);font-size:19px;}
+.vos-nav form input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:99px;
+  padding:8px 15px;color:var(--text);font-size:13px;}
+.vos-nav form input:focus{outline:none;border-color:var(--accent);}
+.vos-nav form button{width:34px;height:34px;border-radius:50%;border:none;background:var(--accent);
+  color:#11111b;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.vos-nav iframe{flex:1;border:none;width:100%;background:#fff;}
+
+/* ---- Settings ---- */
+.vos-settings{padding:20px;display:flex;flex-direction:column;gap:6px;background:var(--bg);min-height:100%;}
+.vos-settings label{font-size:12.5px;font-weight:700;color:var(--muted);margin-top:12px;}
+.vos-settings input{padding:10px 14px;border-radius:11px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);font-size:14px;}
+.vos-settings input:focus{outline:none;border-color:var(--accent);}
+.vos-settings .vps-btn{margin-top:18px;align-self:flex-start;}
+.vos-settings-msg{color:var(--ok);font-size:13px;margin-top:12px;display:flex;align-items:center;gap:7px;}
+
+/* ---- Liste generiche (Music / Mail) ---- */
+.vos-generic{padding:10px;background:var(--bg);min-height:100%;display:flex;flex-direction:column;gap:4px;}
+.vos-generic-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:11px;
+  font-size:13.5px;line-height:1.5;transition:background .1s;}
+.vos-generic-row:hover{background:var(--button);}
+.vos-generic-row .mi{color:var(--accent);font-size:21px;flex-shrink:0;}
+.vos-generic-row b{color:var(--accent);}
+
+/* ---- Gallery ---- */
+.vos-gallery{padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+  gap:10px;background:var(--bg);min-height:100%;}
+.vos-gallery-cell{aspect-ratio:1;border-radius:13px;border:1px solid var(--border);
+  background:linear-gradient(145deg,#33334e,#22223a);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:border-color .12s,transform .12s;}
+.vos-gallery-cell:hover{border-color:var(--accent);transform:scale(1.04);}
+.vos-gallery-cell .mi{font-size:34px;color:var(--faint);}
+
+/* ---- Calendar ---- */
+.vos-calendar{padding:20px;background:var(--bg);min-height:100%;}
+.vos-calendar h3{text-transform:capitalize;font-size:17px;margin-bottom:16px;}
+.vos-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.vos-cal-grid span{display:flex;align-items:center;justify-content:center;aspect-ratio:1;
+  border-radius:9px;font-size:13px;background:var(--surface);border:1px solid var(--border);}
+.vos-cal-grid span.today{background:var(--accent);color:#11111b;font-weight:800;border-color:var(--accent);}
+
+/* ---- Clock ---- */
+.vos-clock-app{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;background:radial-gradient(ellipse at center,#1c1c30,var(--bg));}
+.vos-clock-big{font-size:56px;font-weight:200;letter-spacing:-1px;font-variant-numeric:tabular-nums;}
+
+/* ---- Weather ---- */
+.vos-weather{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;background:linear-gradient(170deg,#33405c,#20263a);}
+.vos-weather-icon{font-size:72px !important;color:var(--warn);}
+.vos-weather-temp{font-size:52px;font-weight:250;}
+.vos-weather p{color:var(--muted);font-size:14.5px;}
+.vos-weather small{color:var(--faint);font-size:11.5px;margin-top:8px;}
+
+/* ---- Messages ---- */
+.vos-messages{height:100%;display:grid;grid-template-columns:180px 1fr;background:var(--bg);}
+.vos-msg-side{border-right:1px solid var(--border);padding:8px;display:flex;flex-direction:column;gap:3px;}
+.vos-msg-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+  font-size:13px;font-weight:600;cursor:pointer;}
+.vos-msg-item .mi{font-size:19px;color:var(--muted);}
+.vos-msg-item.active{background:var(--button);color:var(--accent);}
+.vos-msg-item.active .mi{color:var(--accent);}
+.vos-msg-chat{padding:18px;overflow-y:auto;}
+.vos-msg-chat p{max-width:70%;background:var(--button);border:1px solid var(--border);border-radius:15px;
+  border-bottom-left-radius:5px;padding:11px 15px;font-size:13.5px;line-height:1.6;}
+
+/* ---- Monitor ---- */
+.vos-monitor{padding:22px;display:flex;flex-direction:column;gap:20px;background:var(--bg);min-height:100%;}
+.vos-monitor>div{display:flex;flex-direction:column;gap:8px;font-size:13px;}
+.vos-monitor span{color:var(--muted);font-weight:700;font-size:11.5px;text-transform:uppercase;
+  letter-spacing:.7px;}
+.vos-bar{height:9px;background:#0a0c12;border:1px solid var(--border);border-radius:99px;overflow:hidden;}
+.vos-bar div{height:100%;background:linear-gradient(90deg,var(--accent),#b18cff);border-radius:99px;
+  transition:width .5s ease;}
+.vos-monitor b{font-variant-numeric:tabular-nums;}
+
+/* ---- Paint ---- */
+.vos-paint{height:100%;display:flex;flex-direction:column;background:#0a0c12;}
+.vos-paint-tools{display:flex;align-items:center;gap:9px;padding:10px 14px;
+  border-bottom:1px solid var(--border);}
+.vos-paint-tools button{width:28px;height:28px;border-radius:50%;border:2px solid transparent;
+  cursor:pointer;padding:0;transition:transform .1s,border-color .1s;}
+.vos-paint-tools button:hover{transform:scale(1.15);}
+.vos-paint-tools button.on{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.25);}
+.vos-paint-tools button:last-child{background:transparent !important;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;color:var(--muted);}
+.vos-paint-tools button:last-child .mi{font-size:17px;}
+.vos-paint canvas{flex:1;cursor:crosshair;background:#10131c;}
+
+/* ===================== KairoVOS — F-Pixel Store ===================== */
+.fpixel{height:100%;display:flex;flex-direction:column;background:var(--bg);}
+.fpixel-head{display:flex;align-items:center;gap:14px;padding:16px 20px;
+  border-bottom:1px solid var(--border);}
+.fpixel-head>.mi{font-size:32px;color:var(--accent);}
+.fpixel-head b{font-size:16.5px;display:block;}
+.fpixel-head span{font-size:12px;color:var(--muted);}
+.fpixel-search{margin:14px 20px 8px;padding:10px 16px;border-radius:11px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);font-size:13.5px;}
+.fpixel-search:focus{outline:none;border-color:var(--accent);}
+.fpixel-status,.fpixel-err{display:flex;align-items:center;gap:9px;padding:10px 22px;font-size:13px;}
+.fpixel-status{color:var(--muted);} .fpixel-status .mi{animation:vos-spin 1.4s linear infinite;}
+.fpixel-err{color:var(--error);}
+.fpixel-list{flex:1;overflow-y:auto;padding:8px 14px 16px;display:flex;flex-direction:column;gap:5px;}
+.fpixel-row{display:flex;align-items:center;gap:14px;padding:11px 13px;border-radius:13px;
+  text-decoration:none;color:var(--text);transition:background .1s;}
+.fpixel-row:hover{background:var(--button);}
+.fpixel-row img,.fpixel-fallback{width:44px;height:44px;border-radius:11px;object-fit:cover;
+  flex-shrink:0;background:var(--surface);border:1px solid var(--border);}
+.fpixel-fallback{display:flex;align-items:center;justify-content:center;}
+.fpixel-fallback .mi{font-size:26px;color:#a6e3a1;}
+.fpixel-row>div{flex:1;min-width:0;}
+.fpixel-row b{font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fpixel-row span{font-size:12px;color:var(--muted);display:block;line-height:1.45;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fpixel-row small{font-size:10.5px;color:var(--faint);font-family:ui-monospace,Menlo,monospace;}
+.fpixel-row>.mi{color:var(--faint);font-size:18px;}
+
+/* ===================== KairoVOS — Visual Pixel Studio ===================== */
+.vps{height:100%;display:flex;flex-direction:column;background:#0d1017;}
+.vps-toolbar{display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-bottom:1px solid #232a3c;background:#141927;}
+.vps-btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:9px;cursor:pointer;
+  background:var(--accent);color:#11111b;font-size:13px;font-weight:700;padding:8px 16px;
+  transition:filter .12s,opacity .12s;}
+.vps-btn:hover{filter:brightness(1.12);}
+.vps-btn:disabled{opacity:.5;cursor:not-allowed;}
+.vps-btn .mi{font-size:17px;}
+.vps-badge{margin-left:auto;font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--ok);background:rgba(166,227,161,.1);border:1px solid var(--ok);
+  padding:4px 10px;border-radius:99px;}
+.vps-editor{width:calc(100% - 28px);margin:14px;flex:1;resize:none;border:1px solid #232a3c;
+  border-radius:11px;background:#0a0d14;color:#c8e3ff;padding:14px;
+  font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.7;}
+.vps-editor:focus{outline:none;border-color:var(--accent);}
+.vps-output{margin:0 14px 14px;max-height:130px;overflow:auto;border:1px solid #232a3c;border-radius:11px;
+  background:#0a0d14;color:#9ee8b8;padding:12px 14px;font-family:ui-monospace,Menlo,monospace;
+  font-size:12px;line-height:1.65;}
