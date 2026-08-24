@@ -1,11 +1,12 @@
 import { Mi } from './Mi'
 import { useAuth } from '../lib/auth'
 
-export type Page = 'store' | 'sdk' | 'dev' | 'contact' | 'about'
+export type Page = 'store' | 'sdk' | 'dev' | 'contact' | 'about' | 'vos'
 
 const NAV: { id: Page; icon: string; label: string }[] = [
   { id: 'store', icon: 'apps', label: 'Store' },
   { id: 'sdk', icon: 'code', label: 'SDK' },
+  { id: 'vos', icon: 'desktop_windows', label: 'VOS' },
   { id: 'dev', icon: 'person', label: 'Developers' },
   { id: 'contact', icon: 'mail', label: 'Contatti' },
   { id: 'about', icon: 'person', label: 'About Me' },

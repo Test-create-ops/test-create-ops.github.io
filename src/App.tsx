@@ -7,6 +7,7 @@ import { SdkPage } from './pages/SdkPage'
 import DevPage from './pages/DevPage'
 import ContactPage from './pages/ContactPage'
 import AboutPage from './pages/AboutPage'
+import VOS from './components/vos/VOS'
 
 export default function App() {
   const [page, setPage] = useState<Page>('store')
@@ -23,20 +24,25 @@ export default function App() {
           <div className="grid-lines" />
         </div>
 
-        <Header page={page} setPage={setPage} />
-        {page === 'store' && <StorePage setPage={setPage} />}
-        {page === 'sdk' && <SdkPage setPage={setPage} />}
-        {page === 'dev' && <DevPage />}
-        {page === 'contact' && <ContactPage />}
-        {page === 'about' && <AboutPage />}
+        {page === 'vos' && <VOS onExit={() => setPage('store')} />}
+        {page !== 'vos' && (
+          <>
+            <Header page={page} setPage={setPage} />
+            {page === 'store' && <StorePage setPage={setPage} />}
+            {page === 'sdk' && <SdkPage setPage={setPage} />}
+            {page === 'dev' && <DevPage />}
+            {page === 'contact' && <ContactPage />}
+            {page === 'about' && <AboutPage />}
 
-        <footer>
-          <div className="foot-brand">
-            <img src="/icons/kairo_logo.png" alt="Kairo" />
-            Kairo<b style={{ color: 'var(--accent)' }}>Dev</b>
-          </div>
-          <p>© {new Date().getFullYear()} kairodev.it · Costruito con passione, un pezzetto alla volta.</p>
-        </footer>
+            <footer>
+              <div className="foot-brand">
+                <img src="/icons/kairo_logo.png" alt="Kairo" />
+                Kairo<b style={{ color: 'var(--accent)' }}>Dev</b>
+              </div>
+              <p>© {new Date().getFullYear()} kairodev.it · Costruito con passione, un pezzetto alla volta.</p>
+            </footer>
+          </>
+        )}
       </ToastProvider>
     </AuthProvider>
   )
