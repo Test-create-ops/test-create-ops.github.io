@@ -1,1 +1,4 @@
+node_modules
+dist
+old-index.html.bak
 .DS_Store

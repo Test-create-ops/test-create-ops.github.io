@@ -1,0 +1,1 @@
+export const CLERK_PUBLISHABLE_KEY = 'pk_test_d29ya2luZy1qYWNrYWwtNzAyMi5jbGVyay5hY2NvdW50cy5kZXYk'
